@@ -1,12 +1,24 @@
-table, td, th {
-    border: 3px white solid;
+form {
+    border: 1px gray solid;    
 }
 
+table, td, th {
+    border: 3px white solid;
+    border-collapse: collapse;
+}
+
+th {
+    color: white;
+    background-color: gray;
+}
 td {
     padding: 0.2em 1em;
 }
 
-td.name {
+tr.even-row {
+    background-color: white;
+}
+tr.odd-row {
     background-color: ghostwhite;
 }
 td.value td.binary {
@@ -14,7 +26,7 @@ td.value td.binary {
 }
 
 .binHead {
-    background-color: whitesmoke;
+    background-color: lemonchiffon;
 }
 .binTail {
     font-weight: bold;

@@ -6,6 +6,8 @@
     </head>
     <body>
         <div id="ipCalc">
+            <h1>IP Calculator</h1>
+            <h2>Input IP/Mask</h2>
             <form>
                 <ul>
                     <li>
@@ -18,19 +20,29 @@
                     </li>
                 </ul>
             </form>
-            <div v-if="invalidAddr" id="invalidAddrWarn">
-                Invalid IP Address or Mask.
-            </div>
-            <table>
-                <tr v-for="row in rows">
-                    <td class="name">{{row.name}}</td>
-                    <td class="value">{{row.value}}</td>
-                    <td class="binary">
-                        <span class="binHead">{{row.binary.head}}</span>
-                        <span class="binTail">{{row.binary.tail}}</span>
-                    </td>
-                </tr>
-            </table>
+            <p>
+                <div v-if="invalidAddr" id="invalidAddrWarn">
+                    Invalid IP Address or Mask.
+                </div>
+            </p>
+            <h2>Calculated values</h2>
+            <p>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                        <th>Binary</th>
+                    </tr>
+                    <tr v-for="(row, index) in rows" v-bind:class="index % 2 ? 'even-row' : 'odd-row' ">
+                        <td class="name">{{row.name}}</td>
+                        <td class="value">{{row.value}}</td>
+                        <td class="binary">
+                            <span class="binHead">{{row.binary.head}}</span>
+                            <span class="binTail">{{row.binary.tail}}</span>
+                        </td>
+                    </tr>
+                </table>
+            </p>
         </div>
         <script src="bundle.js"></script>
     </body>

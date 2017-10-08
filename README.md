@@ -1,5 +1,6 @@
 # ipcalc_js
 IP Calculator using Vue.js
+(inspired by [IP Calculator / IP Subnetting](http://jodies.de/ipcalc))
 
 ## Installation
 ### Install Node.js/npm
@@ -39,3 +40,7 @@ webpack ipcalc.js bundle.js
 
 # Usage
 Build and open `ipcalc.html` by browser.
+All values are calculated automatically when you change IP/Mask input field.
+(No need to push button and wait response.)
+
+![Sample](./figs/ipcalc.png)
