@@ -32,7 +32,7 @@ td.value td.binary {
     font-weight: bold;
 }
 
-#invalidAddrWarn {
+.warn {
     border: 3px pink solid;
     padding: 0.5em;
     background-color: lavenderblush;

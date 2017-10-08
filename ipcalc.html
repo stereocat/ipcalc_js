@@ -21,8 +21,11 @@
                 </ul>
             </form>
             <p>
-                <div v-if="invalidAddr" id="invalidAddrWarn">
-                    Invalid IP Address or Mask.
+                <div v-if="invalidAddr" class="warn">
+                    Invalid IP Address.
+                </div>
+                <div v-if="invalidMask" class="warn">
+                    Invalid Netmask.
                 </div>
             </p>
             <h2>Calculated values</h2>
