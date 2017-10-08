@@ -1,0 +1,27 @@
+table, td, th {
+    border: 3px white solid;
+}
+
+td {
+    padding: 0.2em 1em;
+}
+
+td.name {
+    background-color: ghostwhite;
+}
+td.value td.binary {
+    font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+}
+
+.binHead {
+    background-color: whitesmoke;
+}
+.binTail {
+    font-weight: bold;
+}
+
+#invalidAddrWarn {
+    border: 3px pink solid;
+    padding: 0.5em;
+    background-color: lavenderblush;
+}

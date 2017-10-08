@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>IP Calculator</title>
+        <link rel="stylesheet" type="text/css" href="./ipcalc.css">
+    </head>
+    <body>
+        <div id="ipCalc">
+            <form>
+                <ul>
+                    <li>
+                        <label for="ipAddr">IP Address</label>
+                        <input type="text" id="ipAddr" v-model="ipAddr">
+                    </li>
+                    <li>
+                        <label for="length">Subnet Mask or Length</label>
+                        <input type="text" id="subnet" v-model="subnet"> (i.e. 24 or 255.255.255.0)
+                    </li>
+                </ul>
+            </form>
+            <div v-if="invalidAddr" id="invalidAddrWarn">
+                Invalid IP Address or Mask.
+            </div>
+            <table>
+                <tr v-for="row in rows">
+                    <td class="name">{{row.name}}</td>
+                    <td class="value">{{row.value}}</td>
+                    <td class="binary">
+                        <span class="binHead">{{row.binary.head}}</span>
+                        <span class="binTail">{{row.binary.tail}}</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <script src="bundle.js"></script>
+    </body>
+</html>
