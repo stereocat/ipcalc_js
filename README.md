@@ -21,11 +21,6 @@ Then, delete old ubuntu packages.
 sudo apt-get purge -y nodejs npm
 ```
 
-### Install WebPack
-```
-sudo npm install webpack -g
-```
-
 ### Install required packages
 Install packages by `package.json`
 ```
@@ -33,9 +28,8 @@ npm install
 ```
 
 ## Build
-Build (generate) `bundle.js` using `webpack`.
 ```
-webpack ipcalc.js bundle.js
+webpack run build
 ```
 
 # Usage

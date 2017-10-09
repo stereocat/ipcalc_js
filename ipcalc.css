@@ -32,8 +32,25 @@ td.value td.binary {
     font-weight: bold;
 }
 
+#addrType {
+    border: 3px darkgreen solid;
+    padding: 0.5em;
+    background-color: mintcream;
+    margin: 0.2em;
+}
+
 .warn {
     border: 3px pink solid;
-    padding: 0.5em;
     background-color: lavenderblush;
+    margin: 0.2em;
+}
+
+.warnFade-enter-active, .warnFade-leave-active {
+    transition: opacity 0.3s;
+}
+.warnFade-leave, .warnFade-enter-to {
+    opacity: 1;
+}
+.warnFade-enter, .warnFade-leave-to {
+    opacity: 0;
 }

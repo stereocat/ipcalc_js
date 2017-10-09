@@ -16,10 +16,11 @@ var app = new Vue({
 
         length: function() {
             var val = -1; // default (error value)
-            if (this.validMaskLengthStr(this.subnet)){
+            if (this.validMaskLengthStr(this.subnet)) {
                 val = Number(this.subnet);
             } else if (this.validIPv4MaskStr(this.subnet)) {
-                val = ip.subnet('127.0.0.0', this.subnet).subnetMaskLength; // dummy ip
+                // use dummy ip, to delink ipAddr validness
+                val = ip.subnet('127.0.0.0', this.subnet).subnetMaskLength;
             } else {
                 this.invalidMask = true;
             }
@@ -82,6 +83,14 @@ var app = new Vue({
         numberOfAddrs: function() {
             return this.ipv4Subnet().length;
         },
+
+        addrType: function() {
+            if (!this.validIPv4Str(this.ipAddr)) {
+                console.log("invalid ipaddr in typeOfAddr, " + this.ipAddr);
+                return false;
+            }
+            return this.searchAddrType();
+        },
         rows: function() {
             return [
                 { name: "IP Address", value: this.ipAddr, binary: this.binIpAddr },
@@ -99,33 +108,56 @@ var app = new Vue({
     },
     watch: {
         ipAddr: function(newIPStr) {
-            try {
-                if (this.validIPv4Str(newIPStr)) {
-                    this.invalidAddr = false;
-                    this.ipAddr = newIPStr;
-                } else {
-                    throw new Error("invalidIPAddr: " + newIPStr);
-                }
-            } catch(err) {
-                this.invalidAddr = true;
-                console.log("error in ipAddr watcher, %s", err);
+            this.invalidAddr = true;
+            if (this.validIPv4Str(newIPStr)) {
+                this.invalidAddr = false; // clear invalid state
+                this.ipAddr = newIPStr;
             }
         },
         subnet: function(newSubnetStr) {
-            try {
-                if (this.validMask(newSubnetStr)) {
-                    this.invalidMask = false;
-                    this.subnet = newSubnetStr; // string (also, if length-number)
-                } else {
-                    throw new Error("invalidMask");
-                }
-            } catch(err) {
-                this.invalidMask = true;
-                console.log("error in subnet watcher, %s", err);
+            this.invalidMask = true;
+            if (this.validMask(newSubnetStr)) {
+                this.invalidMask = false; // clear invalid state
+                this.subnet = newSubnetStr; // string (even if length-number)
             }
         }
     },
     methods: {
+        searchAddrType: function() {
+            var blockList = [
+                { addrBlock: "0.0.0.0/8", name: "This host on this network", rfc: 1122 },
+                { addrBlock: "10.0.0.0/8", name: "Private-Use", rfc: 1918 },
+                { addrBlock: "100.64.0.0/10", name: "Shared Address Space", rfc: 6598 },
+                { addrBlock: "127.0.0.0/8", name: "Loopback", rfc: 1122 },
+                { addrBlock: "169.254.0.0/16", name: "Link Local", rfc: 3927 },
+                { addrBlock: "172.16.0.0/12", name: "Private-Use", rfc: 1918 },
+                { addrBlock: "192.0.0.0/29", name: "DS-Lite", rfc: 6333 },
+                { addrBlock: "192.0.0.0/24", name: "IETF Protocol Assignments", rfc: 6890 },
+                { addrBlock: "192.0.2.0/24", name: "Documentation (TEST-NET-1)", rfc: 5737 },
+                { addrBlock: "192.88.99.0/24 ", name: "6to4 Relay Anycast", rfc: 3068 },
+                { addrBlock: "192.168.0.0/16", name: "Private-Use", rfc: 1918 },
+                { addrBlock: "198.18.0.0/15", name: "Benchmarking", rfc: 2544 },
+                { addrBlock: "198.51.100.0/24", name: "Documentation (TEST-NET-2)", rfc: 5737 },
+                { addrBlock: "203.0.113.0/24", name: "Documentation (TEST-NET-3)", rfc: 5737 },
+                { addrBlock: "224.0.0.0/4", name: "Multicast", rfc: 3171 },
+                { addrBlock: "255.255.255.255/32", name: "Limited Broadcast", rfc: 919 },
+                { addrBlock: "240.0.0.0/4", name: "Reserved", rfc: 1112 },
+                // old
+                { addrBlock: "14.0.0.0/8", name: "Public-Data Networks (in RFC3330) but no longer reserved", rfc: 5735 },
+                { addrBlock: "24.0.0.0/8", name: "Cable Television Networks (in RFC3330) but no longer reserved", rfc: 5735 },
+                { addrBlock: "39.0.0.0/8", name: "Reserved (in RFC3330) but no longer reserved", rfc: 5735 },
+                { addrBlock: "128.0.0.0/16", name: "Reserved (in RFC3330) but no longer reserved", rfc: 5735 },
+                { addrBlock: "191.255.0.0/16", name: "Reserved (in RFC3330) but no longer reserved", rfc: 5735 },
+                { addrBlock: "223.255.255.0/24", name: "Reserved (in RFC3330) but no longer reserved", rfc: 5735 }
+            ];
+            var ipaddr = this.ipAddr;
+            for(var i = 0; i < blockList.length; i++) {
+                if (ip.cidrSubnet(blockList[i].addrBlock).contains(this.ipAddr)) {
+                    return blockList[i];
+                }
+            }
+            return { addrBlock: [this.ipAddr, this.length].join("/"), name: "Global", rfc: 0 };
+        },
         validMask: function(subnetStr) {
             return this.validMaskLengthStr(subnetStr) || this.validIPv4MaskStr(subnetStr);
         },
@@ -144,7 +176,7 @@ var app = new Vue({
             return /^(((255\.){3}(255|254|252|248|240|224|192|128|0+))|((255\.){2}(255|254|252|248|240|224|192|128|0+)\.0)|((255\.)(255|254|252|248|240|224|192|128|0+)(\.0+){2})|((255|254|252|248|240|224|192|128|0+)(\.0+){3}))$/.test(ipv4MaskStr);
         },
         validIPv4Str: function(ipv4Str) {
-            // return ip.isV4Format(ipv4Str);
+            // return ip.isV4Format(ipv4Str); // it is not good format checker...
             return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipv4Str);
         },
         validMaskLengthStr: function(lenStr) {

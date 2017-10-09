@@ -20,14 +20,10 @@
                     </li>
                 </ul>
             </form>
-            <p>
-                <div v-if="invalidAddr" class="warn">
-                    Invalid IP Address.
-                </div>
-                <div v-if="invalidMask" class="warn">
-                    Invalid Netmask.
-                </div>
-            </p>
+            <transition-group name="warnFade" tag="p">
+                <div v-if="invalidAddr" key="ipWarn" class="warn">Invalid IP Address.</div>
+                <div v-if="invalidMask" key="maskWarn" class="warn">Invalid Netmask.</div>
+            </transition-group>
             <h2>Calculated values</h2>
             <p>
                 <table>
@@ -45,6 +41,13 @@
                         </td>
                     </tr>
                 </table>
+                <div id="addrType" v-if="addrType">
+                    IP Info
+                    <ul>
+                        <li>Address Block {{addrType.addrBlock}} is {{addrType.name}}.</li>
+                        <li v-if="addrType.rfc > 0">Defined in RFC{{addrType.rfc}}</li>
+                    </ul>
+                </div>
             </p>
         </div>
         <script src="bundle.js"></script>
