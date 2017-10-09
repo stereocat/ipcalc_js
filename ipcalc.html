@@ -41,14 +41,13 @@
                         </td>
                     </tr>
                 </table>
-                <div id="addrType" v-if="addrType">
-                    IP Info
-                    <ul>
-                        <li>Address Block {{addrType.addrBlock}} is {{addrType.name}}.</li>
-                        <li v-if="addrType.rfc > 0">Defined in RFC{{addrType.rfc}}</li>
-                    </ul>
-                </div>
             </p>
+            <transition-group name="ipInfoFade" tag="p">
+                <div  id="addrType" v-if="addrType" key="ipInfo">
+                    Address Block {{addrType.addrBlock}} is {{addrType.name}}.
+                    Defined in RFC{{addrType.rfc}}.
+                </div>
+            </transition>
         </div>
         <script src="bundle.js"></script>
     </body>

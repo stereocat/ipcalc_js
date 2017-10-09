@@ -156,7 +156,7 @@ var app = new Vue({
                     return blockList[i];
                 }
             }
-            return { addrBlock: [this.ipAddr, this.length].join("/"), name: "Global", rfc: 0 };
+            return false;
         },
         validMask: function(subnetStr) {
             return this.validMaskLengthStr(subnetStr) || this.validIPv4MaskStr(subnetStr);
