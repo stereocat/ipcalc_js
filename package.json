@@ -1,8 +1,11 @@
 {
   "name": "IPCalc",
   "version": "0.0.1",
+  "entry": "./src/js/ipcalc.js",
   "description": "IP Calculator",
   "dependencies": {
+    "d3": "^4.11.0",
+    "d3-hierarchy": "^1.1.5",
     "ip": "^1.1.5",
     "vue": "^2.4.4"
   },

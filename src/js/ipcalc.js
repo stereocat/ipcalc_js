@@ -1,7 +1,7 @@
 var Vue = require("vue");
 var ip = require("ip");
 
-var app = new Vue({
+var ipcalc_vue = new Vue({
     el: '#ipCalc',
     data: {
         ipAddr: '192.168.0.1',
@@ -102,8 +102,85 @@ var app = new Vue({
                 { name: "Last Host Address", value: this.last, binary: this.binLast },
                 { name: "Broadcast Address", value: this.broadcast, binary: this.binBroadcast },
                 { name: "Number of Hosts", value: this.numberOfHosts, binary: "" },
-                { name: "Number of Addresses", value: this.numberOfAddrs, binary: "" }
+                { name: "Number of Addresses", value: this.numberOfAddrs, binary: "" },
+                { name: "Prev Block", value: this.prevBlock, binary: "" },
+                { name: "Next Block", value: this.nextBlock, binary: "" },
+                { name: "Parent Block", value: this.parentBlock, binary: "" },
+                { name: "Child Block (Head)", value: this.headChildBlock, binary: "" },
+                { name: "Child Block (Tail)", value: this.tailChildBlock, binary: "" }
             ];
+        },
+        prevBlock: function() {
+            try {
+                var prevBCastAddrLong = ip.toLong(this.network) - 1;
+                if (prevBCastAddrLong < 0) { // ip.toLong('0.0.0.0')
+                    throw Error("prev block does not exists (this is first block)");
+                }
+                return this.cidrStr(ip.fromLong(prevBCastAddrLong), this.length);
+            } catch(err) {
+                console.log("error in prevBlock");
+                return "";
+            }
+        },
+        nextBlock: function() {
+            try {
+                var nextNWAddrLong = ip.toLong(this.broadcast) + 1;
+                if (nextNWAddrLong > 4294967295) { // ip.toLong('255.255.255.255')
+                    throw Error("next block does not exists (this is last block)");
+                }
+                return this.cidrStr(ip.fromLong(nextNWAddrLong), this.length);
+            } catch(err) {
+                console.log("error in nextBlock");
+                return "";
+            }
+        },
+        cidrAddr: function() {
+            return this.cidrStr(this.ipAddr, this.length);
+        },
+        cidrBlock: function() {
+            return this.cidrStr(this.network, this.length);
+        },
+        headBlotherBlock: function() {
+            if (this.prevBlock) {
+                console.log("parent nw: %s")
+                return ip.cidrSubnet(this.parentBlock).networkAddress === this.network ?
+                    this.cidrBlock : this.prevBlock;
+            }
+            return "";
+        },
+        tailBlotherBlock: function() {
+            if (this.nextBlock) {
+                return ip.cidrSubnet(this.parentBlock).broadcastAddress === this.broadcast ?
+                    this.cidrBlock : this.nextBlock;
+            }
+            return "";
+        },
+        parentBlock: function() {
+            if (this.length < 1) {
+                console.log("parent block does not exists (this is maximum block)");
+                return "";
+            }
+            return this.cidrStr(this.ipAddr, this.length - 1);
+        },
+
+        childrenBlocks: function() {
+            if (this.length > 31) {
+                console.log("children blocks does not exist (this is minimum block)");
+                return ["", ""];
+            }
+            return [
+                this.cidrStr(this.network, this.length + 1), // head block
+                this.cidrStr(this.broadcast, this.length + 1) // tail block
+            ];
+        },
+        headChildBlock: function() {
+            return this.childrenBlocks[0];
+        },
+        tailChildBlock: function() {
+            return this.childrenBlocks[1];
+        },
+        binTree: function() {
+            // TODO
         }
     },
     watch: {
@@ -123,6 +200,18 @@ var app = new Vue({
         }
     },
     methods: {
+        calcChildrenBlocks: function(cidrStr) {
+            // TODO
+        },
+        cidrStr: function(addrStr, length) {
+            try {
+                var subnet = ip.cidrSubnet([addrStr, length].join('/'));
+                return [subnet.networkAddress, length].join('/');
+            } catch(err) {
+                console.log("error in cidrStr");
+                return "";
+            }
+        },
         searchAddrType: function() {
             var blockList = [
                 { addrBlock: "0.0.0.0/8", name: "This host on this network", rfc: 1122 },
@@ -199,7 +288,7 @@ var app = new Vue({
                     return { head: "", tail: binDottedStr };
                 }
             } catch (err) {
-                console.log("error in toBin, %s", err);
+                console.log("error in toBin");
                 return "";
             }
         },
@@ -208,3 +297,77 @@ var app = new Vue({
         }
     }
 });
+
+
+//////////////////////////////
+// d3.js test
+
+function buildAddrTree(cidrStr, layerNum) {
+    var subnet = ip.cidrSubnet(cidrStr);
+    var nwAddr = subnet.networkAddress;
+    var bcAddr = subnet.broadcastAddress;
+    var childLength = subnet.subnetMaskLength + 1;
+    var headChildNWAddr = ip.cidrSubnet([nwAddr, childLength].join('/')).networkAddress;
+    var tailChildNWAddr = ip.cidrSubnet([bcAddr, childLength].join('/')).networkAddress;
+    return layerNum === 0 ? {
+            name: cidrStr,
+            size: subnet.length
+        } : {
+            name: cidrStr,
+            children: [
+                buildAddrTree([headChildNWAddr, childLength].join('/'), layerNum - 1),
+                buildAddrTree([tailChildNWAddr, childLength].join('/'), layerNum - 1)
+            ]
+        };
+};
+
+import * as d3 from 'd3';
+const blockLayerNum = 2;
+var width = 0.7 * window.innerWidth;
+var height = blockLayerNum * width / Math.pow(2, blockLayerNum);
+var padding = height / 20;
+
+// convert to hierarchical Node object
+var rootCidrBlock = ipcalc_vue.parentBlock || ipcalc_vue.cidrBlock;
+var rootNode = d3.hierarchy(buildAddrTree(rootCidrBlock, blockLayerNum))
+    .sum(function(d) { return d.size; });
+console.log("buildAddrTree : %o", rootNode);
+var treemapLayout = d3.treemap()
+    .tile(d3.treemapSlice)
+    .round(true)
+    .paddingOuter(padding)
+    .paddingInner(padding)
+    .size([width, height]);
+var addrBlocks = treemapLayout(rootNode);
+console.log("addrBlocks: %o", addrBlocks.descendants());
+
+var svg = d3.select("body")
+    .select("div#ipCalcView")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "scale(0.9, 0.9)");
+
+svg.selectAll("rect")
+    .data(addrBlocks.descendants())
+    .enter()
+    .append("rect")
+    .attr("class", function(d) {
+        return d.data.name === ipcalc_vue.cidrBlock ? "targetBlock" : "normalBlock";
+    })
+    .attr("x", function(d) { return d.x0; })
+    .attr("y", function(d) { return d.y0; })
+    .attr("width", function(d) { return d.x1 - d.x0; })
+    .attr("height", function(d) { return d.y1 - d.y0; })
+    .append("title")
+    .text(function(d) { return d.data.name; });
+
+    svg.selectAll("text")
+    .data(addrBlocks.descendants())
+    .enter()
+    .append("text")
+    .attr("x", function(d) { return d.x0; })
+    .attr("y", function(d) { return d.y0; })
+    .attr("dy", function(d) { return padding * 0.8; })
+    .text(function(d) { return d.data.name; });

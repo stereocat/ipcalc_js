@@ -57,3 +57,19 @@ td.value td.binary {
 .ipInfoFade-enter, .ipInfoFade-leave-to {
     opacity: 0;
 }
+
+rect {
+    stroke: white;
+    stroke-width: 3pt;
+    opacity: 0.8;
+}
+rect.normalBlock {
+    fill: lavender;
+}
+rect.targetBlock {
+    fill: pink;
+}
+text {
+    font-family: sans-serif;
+    fill: black;
+}
