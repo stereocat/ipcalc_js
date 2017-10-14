@@ -2,16 +2,12 @@
   "name": "IPCalc",
   "version": "0.0.1",
   "description": "IP Calculator",
-  "main": "ipcalc.html",
   "dependencies": {
     "ip": "^1.1.5",
     "vue": "^2.4.4"
   },
-  "devDependencies": {
-    "webpack": "^3.6.0"
-  },
+  "devDependencies": {},
   "scripts": {
-    "build": "webpack ipcalc.js bundle.js"
   },
   "author": "stereocat",
   "license": "MIT"
