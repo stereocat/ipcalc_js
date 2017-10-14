@@ -8,6 +8,7 @@
   },
   "devDependencies": {},
   "scripts": {
+    "build": "webpack"
   },
   "author": "stereocat",
   "license": "MIT"
