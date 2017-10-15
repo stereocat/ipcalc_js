@@ -29,7 +29,7 @@ npm install
 
 ## Build
 ```
-webpack run build
+npm run build
 ```
 
 # Usage
