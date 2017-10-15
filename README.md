@@ -34,6 +34,13 @@ npm run build
 
 # Usage
 Build and open `ipcalc.html` by browser.
+
+Or, run http server
+```
+npm start
+```
+and access `http://localhost:3000/`.
+
 All values are calculated automatically when you change IP/Mask input field.
 (No need to push button and wait response.)
 

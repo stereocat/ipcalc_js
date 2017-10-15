@@ -10,6 +10,17 @@ var ipcalc_vue = new Vue({
         invalidAddr: false,
         invalidMask: false,
         blockLayerNum: 2,
+        svg: null
+    },
+    mounted: function() {
+        this.svg = d3.select("body")
+            .select("div#ipCalcView")
+            .append("svg")
+            .attr("width", this.width)
+            .attr("height", this.height)
+            .append("g")
+            .attr("transform", "scale(0.9, 0.9)");
+        this.treeView();
     },
     computed: {
         width: function () {
@@ -17,12 +28,6 @@ var ipcalc_vue = new Vue({
         },
         height: function () {
             return this.blockLayerNum * this.width / Math.pow(2, this.blockLayerNum);
-        },
-        svg: function() {
-            return d3.select("body")
-                .select("div#ipCalcView")
-                .select("svg")
-                .select("g");
         },
 
         binIpAddr: function() {
@@ -230,6 +235,8 @@ var ipcalc_vue = new Vue({
             console.log("layouted tree nodes: %o", layoutedNodeTree.descendants());
 
             var targetBlock = this.cidrBlock; // to refer in attr lambda
+
+            // rectangles (NodeTree map)
             var svgRects = this.svg
                 .selectAll("rect")
                 .data(layoutedNodeTree.descendants());
@@ -253,7 +260,8 @@ var ipcalc_vue = new Vue({
                 .attr("width", function(d) { return d.x1 - d.x0; })
                 .attr("height", function(d) { return d.y1 - d.y0; });
 
-            var svgTexts = svg.selectAll("text")
+            // text label
+            var svgTexts = this.svg.selectAll("text")
                 .data(layoutedNodeTree.descendants());
             svgTexts.enter()
                 .append("text")
@@ -381,15 +389,3 @@ var ipcalc_vue = new Vue({
         }
     }
 });
-
-//////////////////////////////
-// TreeView (initial state)
-
-var svg = d3.select("body")
-    .select("div#ipCalcView")
-    .append("svg")
-    .attr("width", ipcalc_vue.width)
-    .attr("height", ipcalc_vue.height)
-    .append("g")
-    .attr("transform", "scale(0.9, 0.9)");
-ipcalc_vue.treeView();
