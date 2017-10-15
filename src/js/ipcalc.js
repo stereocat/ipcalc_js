@@ -1,5 +1,6 @@
 var Vue = require("vue");
 var ip = require("ip");
+import * as d3 from 'd3';
 
 var ipcalc_vue = new Vue({
     el: '#ipCalc',
@@ -7,9 +8,23 @@ var ipcalc_vue = new Vue({
         ipAddr: '192.168.0.1',
         subnet: '255.255.255.0',
         invalidAddr: false,
-        invalidMask: false
+        invalidMask: false,
+        blockLayerNum: 2,
     },
     computed: {
+        width: function () {
+            return 0.7 * window.innerWidth;
+        },
+        height: function () {
+            return this.blockLayerNum * this.width / Math.pow(2, this.blockLayerNum);
+        },
+        svg: function() {
+            return d3.select("body")
+                .select("div#ipCalcView")
+                .select("svg")
+                .select("g");
+        },
+
         binIpAddr: function() {
             return this.toBin(this.ipAddr);
         },
@@ -104,10 +119,7 @@ var ipcalc_vue = new Vue({
                 { name: "Number of Hosts", value: this.numberOfHosts, binary: "" },
                 { name: "Number of Addresses", value: this.numberOfAddrs, binary: "" },
                 { name: "Prev Block", value: this.prevBlock, binary: "" },
-                { name: "Next Block", value: this.nextBlock, binary: "" },
-                { name: "Parent Block", value: this.parentBlock, binary: "" },
-                { name: "Child Block (Head)", value: this.headChildBlock, binary: "" },
-                { name: "Child Block (Tail)", value: this.tailChildBlock, binary: "" }
+                { name: "Next Block", value: this.nextBlock, binary: "" }
             ];
         },
         prevBlock: function() {
@@ -179,8 +191,11 @@ var ipcalc_vue = new Vue({
         tailChildBlock: function() {
             return this.childrenBlocks[1];
         },
-        binTree: function() {
-            // TODO
+        rootNode: function() {
+            // convert to hierarchical Node object
+            var rootCidrBlock = this.parentBlock || this.cidrBlock;
+            return d3.hierarchy(this.buildAddrTree(rootCidrBlock, this.blockLayerNum))
+                .sum(function(d) { return d.size; });
         }
     },
     watch: {
@@ -189,6 +204,7 @@ var ipcalc_vue = new Vue({
             if (this.validIPv4Str(newIPStr)) {
                 this.invalidAddr = false; // clear invalid state
                 this.ipAddr = newIPStr;
+                this.treeView();
             }
         },
         subnet: function(newSubnetStr) {
@@ -196,12 +212,80 @@ var ipcalc_vue = new Vue({
             if (this.validMask(newSubnetStr)) {
                 this.invalidMask = false; // clear invalid state
                 this.subnet = newSubnetStr; // string (even if length-number)
+                this.treeView();
             }
         }
     },
     methods: {
-        calcChildrenBlocks: function(cidrStr) {
-            // TODO
+        treeView: function() {
+            var padding = this.height / 20;
+
+            var treemapLayout = d3.treemap()
+                .tile(d3.treemapSlice)
+                .round(true)
+                .paddingOuter(padding)
+                .paddingInner(padding)
+                .size([this.width, this.height]);
+            var layoutedNodeTree = treemapLayout(this.rootNode);
+            console.log("layouted tree nodes: %o", layoutedNodeTree.descendants());
+
+            var targetBlock = this.cidrBlock; // to refer in attr lambda
+            var svgRects = this.svg
+                .selectAll("rect")
+                .data(layoutedNodeTree.descendants());
+            svgRects.enter()
+                .append("rect")
+                .attr("class", function(d) {
+                    return d.data.name === targetBlock ? "targetBlock" : "normalBlock";
+                })
+                .attr("x", function(d) { return d.x0; })
+                .attr("y", function(d) { return d.y0; })
+                .attr("width", function(d) { return d.x1 - d.x0; })
+                .attr("height", function(d) { return d.y1 - d.y0; });
+            svgRects.exit()
+                .remove();
+            svgRects
+                .attr("class", function(d) {
+                    return d.data.name === targetBlock ? "targetBlock" : "normalBlock";
+                })
+                .attr("x", function(d) { return d.x0; })
+                .attr("y", function(d) { return d.y0; })
+                .attr("width", function(d) { return d.x1 - d.x0; })
+                .attr("height", function(d) { return d.y1 - d.y0; });
+
+            var svgTexts = svg.selectAll("text")
+                .data(layoutedNodeTree.descendants());
+            svgTexts.enter()
+                .append("text")
+                .attr("x", function(d) { return d.x0; })
+                .attr("y", function(d) { return d.y0; })
+                .attr("dy", function(d) { return padding * 0.8; })
+                .text(function(d) { return d.data.name; });
+            svgTexts.exit()
+                .remove();
+            svgTexts
+                .attr("x", function(d) { return d.x0; })
+                .attr("y", function(d) { return d.y0; })
+                .attr("dy", function(d) { return padding * 0.8; })
+                .text(function(d) { return d.data.name; });
+        },
+        buildAddrTree: function(cidrStr, layerNum) {
+            var subnet = ip.cidrSubnet(cidrStr);
+            var nwAddr = subnet.networkAddress;
+            var bcAddr = subnet.broadcastAddress;
+            var childLength = subnet.subnetMaskLength + 1;
+            var headChildNWAddr = ip.cidrSubnet([nwAddr, childLength].join('/')).networkAddress;
+            var tailChildNWAddr = ip.cidrSubnet([bcAddr, childLength].join('/')).networkAddress;
+            return layerNum === 0 || subnet.subnetMaskLength === 32 ? {
+                    name: cidrStr,
+                    size: subnet.length
+                } : {
+                    name: cidrStr,
+                    children: [
+                        this.buildAddrTree([headChildNWAddr, childLength].join('/'), layerNum - 1),
+                        this.buildAddrTree([tailChildNWAddr, childLength].join('/'), layerNum - 1)
+                    ]
+                };
         },
         cidrStr: function(addrStr, length) {
             try {
@@ -298,76 +382,14 @@ var ipcalc_vue = new Vue({
     }
 });
 
-
 //////////////////////////////
-// d3.js test
-
-function buildAddrTree(cidrStr, layerNum) {
-    var subnet = ip.cidrSubnet(cidrStr);
-    var nwAddr = subnet.networkAddress;
-    var bcAddr = subnet.broadcastAddress;
-    var childLength = subnet.subnetMaskLength + 1;
-    var headChildNWAddr = ip.cidrSubnet([nwAddr, childLength].join('/')).networkAddress;
-    var tailChildNWAddr = ip.cidrSubnet([bcAddr, childLength].join('/')).networkAddress;
-    return layerNum === 0 ? {
-            name: cidrStr,
-            size: subnet.length
-        } : {
-            name: cidrStr,
-            children: [
-                buildAddrTree([headChildNWAddr, childLength].join('/'), layerNum - 1),
-                buildAddrTree([tailChildNWAddr, childLength].join('/'), layerNum - 1)
-            ]
-        };
-};
-
-import * as d3 from 'd3';
-const blockLayerNum = 2;
-var width = 0.7 * window.innerWidth;
-var height = blockLayerNum * width / Math.pow(2, blockLayerNum);
-var padding = height / 20;
-
-// convert to hierarchical Node object
-var rootCidrBlock = ipcalc_vue.parentBlock || ipcalc_vue.cidrBlock;
-var rootNode = d3.hierarchy(buildAddrTree(rootCidrBlock, blockLayerNum))
-    .sum(function(d) { return d.size; });
-console.log("buildAddrTree : %o", rootNode);
-var treemapLayout = d3.treemap()
-    .tile(d3.treemapSlice)
-    .round(true)
-    .paddingOuter(padding)
-    .paddingInner(padding)
-    .size([width, height]);
-var addrBlocks = treemapLayout(rootNode);
-console.log("addrBlocks: %o", addrBlocks.descendants());
+// TreeView (initial state)
 
 var svg = d3.select("body")
     .select("div#ipCalcView")
     .append("svg")
-    .attr("width", width)
-    .attr("height", height)
+    .attr("width", ipcalc_vue.width)
+    .attr("height", ipcalc_vue.height)
     .append("g")
     .attr("transform", "scale(0.9, 0.9)");
-
-svg.selectAll("rect")
-    .data(addrBlocks.descendants())
-    .enter()
-    .append("rect")
-    .attr("class", function(d) {
-        return d.data.name === ipcalc_vue.cidrBlock ? "targetBlock" : "normalBlock";
-    })
-    .attr("x", function(d) { return d.x0; })
-    .attr("y", function(d) { return d.y0; })
-    .attr("width", function(d) { return d.x1 - d.x0; })
-    .attr("height", function(d) { return d.y1 - d.y0; })
-    .append("title")
-    .text(function(d) { return d.data.name; });
-
-    svg.selectAll("text")
-    .data(addrBlocks.descendants())
-    .enter()
-    .append("text")
-    .attr("x", function(d) { return d.x0; })
-    .attr("y", function(d) { return d.y0; })
-    .attr("dy", function(d) { return padding * 0.8; })
-    .text(function(d) { return d.data.name; });
+ipcalc_vue.treeView();

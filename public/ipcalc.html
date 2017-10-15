@@ -11,11 +11,11 @@
             <form>
                 <ul>
                     <li>
-                        <label for="ipAddr">IP Address</label>
+                        <label for="ipAddr">IP Address : </label>
                         <input type="text" id="ipAddr" v-model="ipAddr">
                     </li>
                     <li>
-                        <label for="length">Subnet Mask or Length</label>
+                        <label for="length">Subnet Mask or Length : </label>
                         <input type="text" id="subnet" v-model="subnet"> (e.g. 24 or 255.255.255.0)
                     </li>
                 </ul>
@@ -49,6 +49,7 @@
                 </div>
             </transition>
         </div>
+        <h2>Address Block Tree</h2>
         <div id="ipCalcView"></div>
         <script src="./js/bundle.js"></script>
     </body>
