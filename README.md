@@ -33,6 +33,11 @@ npm run build
 ```
 
 # Usage
+
+## Demo
+This application is working on Heroku. See http://ipcalcjs.herokuapp.com/ .
+
+## Local
 Build and open `ipcalc.html` by browser.
 
 Or, run http server
