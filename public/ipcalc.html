@@ -48,7 +48,7 @@
             <transition-group name="ipInfoFade" tag="p">
                 <div id="addrType" v-if="addrType" key="ipInfo">
                     Address Block {{addrType.addrBlock}} is {{addrType.name}}.
-                    Defined in RFC{{addrType.rfc}}.
+                    Defined in <a v-bind:href="'https://tools.ietf.org/html/rfc' + addrType.rfc">RFC{{addrType.rfc}}</a>.
                 </div>
             </transition>
         </div>

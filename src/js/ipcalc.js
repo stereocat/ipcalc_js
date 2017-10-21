@@ -30,10 +30,6 @@ var ipcalc_vue = new Vue({
             return this.blockLayerNum * this.width / Math.pow(2, this.blockLayerNum);
         },
 
-        binIpAddr: function() {
-            return this.toBin(this.ipAddr);
-        },
-
         length: function() {
             var val = -1; // default (error value)
             if (this.validMaskLengthStr(this.subnet)) {
@@ -46,7 +42,6 @@ var ipcalc_vue = new Vue({
             }
             return val;
         },
-
         netmask: function() {
             var val = '0.0.0.0'; // default
             if (this.validMaskLengthStr(this.subnet)) {
@@ -58,45 +53,21 @@ var ipcalc_vue = new Vue({
             }
             return val;
         },
-        binNetmask: function() {
-            return this.toBin(this.netmask);
-        },
-
         wildcard: function() {
             return ip.not(this.netmask);
         },
-        binWildcard: function() {
-            return this.toBin(this.wildcard);
-        },
-
         network: function() {
             return this.ipv4Subnet().networkAddress;
         },
-        binNetwork: function() {
-            return this.toBin(this.network);
-        },
-
         broadcast: function() {
             return this.ipv4Subnet().broadcastAddress;
         },
-        binBroadcast: function() {
-            return this.toBin(this.broadcast);
-        },
-
         first: function() {
             return this.ipv4Subnet().firstAddress;
         },
-        binFirst: function() {
-            return this.toBin(this.first);
-        },
-
         last: function() {
             return this.ipv4Subnet().lastAddress;
         },
-        binLast: function() {
-            return this.toBin(this.last);
-        },
-
         numberOfHosts: function() {
             return this.ipv4Subnet().numHosts;
         },
@@ -113,18 +84,19 @@ var ipcalc_vue = new Vue({
         },
         rows: function() {
             return [
-                { name: "IP Address", value: this.ipAddr, binary: this.binIpAddr },
+                { name: "IP Address", value: this.ipAddr, binary: this.toBin(this.ipAddr) },
                 { name: "Subnet Length", value: this.length, binary: "" },
-                { name: "Subnet Mask", value: this.netmask, binary: this.binNetmask },
-                { name: "Wildcard", value: this.wildcard, binary: this.binWildcard },
-                { name: "Network Address", value: this.network, binary: this.binNetwork },
-                { name: "First Host Address", value: this.first, binary: this.binFirst },
-                { name: "Last Host Address", value: this.last, binary: this.binLast },
-                { name: "Broadcast Address", value: this.broadcast, binary: this.binBroadcast },
+                { name: "Subnet Mask", value: this.netmask, binary: this.toBin(this.netmask) },
+                { name: "Wildcard", value: this.wildcard, binary: this.toBin(this.wildcard) },
+                { name: "Network Address", value: this.network, binary: this.toBin(this.network) },
+                { name: "First Host Address", value: this.first, binary: this.toBin(this.first) },
+                { name: "Last Host Address", value: this.last, binary: this.toBin(this.last) },
+                { name: "Broadcast Address", value: this.broadcast, binary: this.toBin(this.broadcast) },
                 { name: "Number of Hosts", value: this.numberOfHosts, binary: "" },
                 { name: "Number of Addresses", value: this.numberOfAddrs, binary: "" },
-                { name: "Prev Block", value: this.prevBlock, binary: "" },
-                { name: "Next Block", value: this.nextBlock, binary: "" }
+                { name: "Prev Block", value: this.prevBlock, binary: this.toBin(this.prevBlock) },
+                { name: "THIS Block", value: this.cidrBlock, binary: this.toBin(this.cidrBlock) },
+                { name: "Next Block", value: this.nextBlock, binary: this.toBin(this.nextBlock) }
             ];
         },
         prevBlock: function() {
@@ -232,29 +204,55 @@ var ipcalc_vue = new Vue({
                 .paddingInner(padding)
                 .size([this.width, this.height]);
             var layoutedNodeTree = treemapLayout(this.rootNode);
-            console.log("layouted tree nodes: %o", layoutedNodeTree.descendants());
 
-            var targetBlock = this.cidrBlock; // to refer in attr lambda
+            // aliases, to refer in attr lambda
+            var targetBlock = this.cidrBlock;
+            var app = this;
 
             // rectangles (NodeTree map)
             var svgRects = this.svg
                 .selectAll("rect")
                 .data(layoutedNodeTree.descendants());
+
+            function setClass(d) {
+                return [
+                        d.data.name,
+                        d.data.name === targetBlock ? "targetBlock" : "normalBlock"
+                    ].join(" ");
+            };
+            function mouseEvent(thisElement, event) {
+                    // is it OK? "ip/mask" string is always head of class attr string.
+                    var selectedStr = thisElement.getAttribute("class").split(" ").shift();
+                    var elementSet = document.getElementById("ipCalcView");
+                    var selectedElements = elementSet.getElementsByClassName(selectedStr);
+                    Array.from(selectedElements).forEach(function(element) {
+                        if (event) {
+                            element.classList.add("selected");
+                        } else {
+                            element.classList.remove("selected");
+                        }
+                    });
+            };
             svgRects.enter()
                 .append("rect")
-                .attr("class", function(d) {
-                    return d.data.name === targetBlock ? "targetBlock" : "normalBlock";
-                })
+                .attr("class", setClass)
                 .attr("x", function(d) { return d.x0; })
                 .attr("y", function(d) { return d.y0; })
                 .attr("width", function(d) { return d.x1 - d.x0; })
-                .attr("height", function(d) { return d.y1 - d.y0; });
+                .attr("height", function(d) { return d.y1 - d.y0; })
+                .on("click", function(d) {
+                    var matches = /([\d\.]+)\/(\d+)/.exec(d.data.name);
+                    if (matches) {
+                        app.ipAddr = matches[1];
+                        app.subnet = matches[2];
+                    }
+                })
+                .on("mouseover", function() { return mouseEvent(this, true); })
+                .on("mouseout", function() { return mouseEvent(this, false); });
             svgRects.exit()
                 .remove();
             svgRects
-                .attr("class", function(d) {
-                    return d.data.name === targetBlock ? "targetBlock" : "normalBlock";
-                })
+                .attr("class", setClass)
                 .attr("x", function(d) { return d.x0; })
                 .attr("y", function(d) { return d.y0; })
                 .attr("width", function(d) { return d.x1 - d.x0; })
@@ -268,6 +266,9 @@ var ipcalc_vue = new Vue({
                 .attr("x", function(d) { return d.x0; })
                 .attr("y", function(d) { return d.y0; })
                 .attr("dy", function(d) { return padding * 0.8; })
+                .attr("class", setClass)
+                .on("mouseover", function() { return mouseEvent(this, true); })
+                .on("mouseout", function() { return mouseEvent(this, false); })
                 .text(function(d) { return d.data.name; });
             svgTexts.exit()
                 .remove();
@@ -275,6 +276,7 @@ var ipcalc_vue = new Vue({
                 .attr("x", function(d) { return d.x0; })
                 .attr("y", function(d) { return d.y0; })
                 .attr("dy", function(d) { return padding * 0.8; })
+                .attr("class", setClass)
                 .text(function(d) { return d.data.name; });
         },
         buildAddrTree: function(cidrStr, layerNum) {
@@ -300,7 +302,6 @@ var ipcalc_vue = new Vue({
                 var subnet = ip.cidrSubnet([addrStr, length].join('/'));
                 return [subnet.networkAddress, length].join('/');
             } catch(err) {
-                console.log("error in cidrStr");
                 return "";
             }
         },
@@ -364,6 +365,10 @@ var ipcalc_vue = new Vue({
             return (/^\d+$/.test(lenStr) && Number(lenStr) >= 0 && Number(lenStr) <= 32);
         },
         toBin: function(dottedStr) {
+            var matches = /([\d\.]+)\/(\d+)/.exec(dottedStr)
+            if (matches) {
+                dottedStr = matches[1]; // x.x.x.x/mm => x.x.x.x
+            }
             try {
                 var buf = ip.toBuffer(dottedStr);
                 var octets = [];
