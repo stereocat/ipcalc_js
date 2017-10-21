@@ -8,7 +8,10 @@ const plugins = [
 if (!DEBUG) {
     plugins.push(
         new webpack.optimize.UglifyJsPlugin(),
-        new webpack.optimize.AggressiveMergingPlugin()
+        new webpack.optimize.AggressiveMergingPlugin(),
+        new webpack.DefinePlugin({
+            'process.env': { NODE_ENV: '"production"' }
+        })
     );
 }
 
