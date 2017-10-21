@@ -220,18 +220,25 @@ var ipcalc_vue = new Vue({
                         d.data.name === targetBlock ? "targetBlock" : "normalBlock"
                     ].join(" ");
             };
-            function mouseEvent(thisElement, event) {
-                    // is it OK? "ip/mask" string is always head of class attr string.
-                    var selectedStr = thisElement.getAttribute("class").split(" ").shift();
-                    var elementSet = document.getElementById("ipCalcView");
-                    var selectedElements = elementSet.getElementsByClassName(selectedStr);
-                    Array.from(selectedElements).forEach(function(element) {
-                        if (event) {
-                            element.classList.add("selected");
-                        } else {
-                            element.classList.remove("selected");
-                        }
-                    });
+            function mouseClick(d) {
+                var matches = /([\d\.]+)\/(\d+)/.exec(d.data.name);
+                if (matches) {
+                    app.ipAddr = matches[1];
+                    app.subnet = matches[2];
+                }
+            };
+            function mouseMove(thisElement, event) {
+                // is it OK? "ip/mask" string is always head of class attr string.
+                var selectedStr = thisElement.getAttribute("class").split(" ").shift();
+                var elementSet = document.getElementById("ipCalcView");
+                var selectedElements = elementSet.getElementsByClassName(selectedStr);
+                Array.from(selectedElements).forEach(function(element) {
+                    if (event) {
+                        element.classList.add("selected");
+                    } else {
+                        element.classList.remove("selected");
+                    }
+                });
             };
             svgRects.enter()
                 .append("rect")
@@ -240,15 +247,9 @@ var ipcalc_vue = new Vue({
                 .attr("y", function(d) { return d.y0; })
                 .attr("width", function(d) { return d.x1 - d.x0; })
                 .attr("height", function(d) { return d.y1 - d.y0; })
-                .on("click", function(d) {
-                    var matches = /([\d\.]+)\/(\d+)/.exec(d.data.name);
-                    if (matches) {
-                        app.ipAddr = matches[1];
-                        app.subnet = matches[2];
-                    }
-                })
-                .on("mouseover", function() { return mouseEvent(this, true); })
-                .on("mouseout", function() { return mouseEvent(this, false); });
+                .on("click", mouseClick)
+                .on("mouseover", function() { return mouseMove(this, true); })
+                .on("mouseout", function() { return mouseMove(this, false); });
             svgRects.exit()
                 .remove();
             svgRects
@@ -267,8 +268,9 @@ var ipcalc_vue = new Vue({
                 .attr("y", function(d) { return d.y0; })
                 .attr("dy", function(d) { return padding * 0.8; })
                 .attr("class", setClass)
-                .on("mouseover", function() { return mouseEvent(this, true); })
-                .on("mouseout", function() { return mouseEvent(this, false); })
+                .on("click", mouseClick)
+                .on("mouseover", function() { return mouseMove(this, true); })
+                .on("mouseout", function() { return mouseMove(this, false); })
                 .text(function(d) { return d.data.name; });
             svgTexts.exit()
                 .remove();
