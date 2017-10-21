@@ -4,6 +4,7 @@ const webpack = require("webpack");
 const DEBUG = process.argv.includes('--debug'); // `webpack --debug` or NOT
 const plugins = [
     new webpack.optimize.OccurrenceOrderPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({ name: "common" })
 ];
 if (!DEBUG) {
     plugins.push(
@@ -18,7 +19,8 @@ if (!DEBUG) {
 module.exports = {
     entry: "./src/js/ipcalc.js",
     output: {
-        filename: "bundle.js",
+        filename: "[name].bundle.js",
+        chunkFilename: "[name].bundle.js",
         path: path.join(__dirname, "public/js")
     },
     plugins: plugins,

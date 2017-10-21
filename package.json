@@ -16,7 +16,8 @@
   "scripts": {
     "build": "webpack --debug",
     "release": "webpack",
-    "start": "node app.js"
+    "start": "node app.js",
+    "clean": "rm ./public/js/*.js"
   },
   "author": "stereocat",
   "license": "MIT"

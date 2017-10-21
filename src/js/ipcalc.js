@@ -1,5 +1,5 @@
-var Vue = require("vue");
-var ip = require("ip");
+import Vue from "vue";
+import ip  from "ip";
 import * as d3 from 'd3';
 
 var ipcalc_vue = new Vue({
