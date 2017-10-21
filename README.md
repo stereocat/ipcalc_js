@@ -28,8 +28,13 @@ npm install
 ```
 
 ## Build
+### Debug build
 ```
 npm run build
+```
+### Release build
+```
+npm run release
 ```
 
 # Usage

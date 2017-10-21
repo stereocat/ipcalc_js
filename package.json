@@ -14,8 +14,9 @@
     "webpack": "^3.7.1"
   },
   "scripts": {
-    "build": "webpack",
-    "start": "webpack && node app.js"
+    "build": "webpack --debug",
+    "release": "webpack",
+    "start": "node app.js"
   },
   "author": "stereocat",
   "license": "MIT"
