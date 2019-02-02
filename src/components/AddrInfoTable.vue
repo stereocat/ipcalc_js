@@ -14,13 +14,22 @@
       [AddrInfoTable.vue debug]
       ip addr: {{ ipAddrString }}, mask: {{ ipBlock.mask }}
     </div>
+    <AddrBlockTree
+      v-bind:ip-addr-string="ipAddrString"
+      v-bind:ip-block="ipBlock" />
   </div>
 </template>
 
 <script>
 import ip from 'ip'
+import AddrBlockTree from './AddrBlockTree'
+import '../css/addr-tree.css'
+
 export default {
   props: ['ipAddrString', 'ipBlock'],
+  components: {
+    AddrBlockTree
+  },
   computed: {
     infoDefs () {
       return [
@@ -29,6 +38,7 @@ export default {
         { name: 'Subnet Mask', value: this.ipBlock.mask },
         { name: 'Wild Card (Host Mask)', value: this.ipBlock.hostmask },
         { name: 'Network Address', value: this.ipBlock.base },
+        { name: 'Broadcast Address', value: this.ipBlock.broadcast },
         { name: 'First Host Address', value: this.ipBlock.first },
         { name: 'Last Host Address', value: this.ipBlock.last },
         { name: 'Block Size (Number of Addresses)', value: this.ipBlock.size },

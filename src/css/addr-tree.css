@@ -1,0 +1,27 @@
+rect {
+    stroke: white;
+    stroke-width: 3pt;
+    opacity: 0.7;
+}
+rect.normalBlock {
+    fill: lavender;
+}
+rect.targetBlock {
+    fill: pink;
+}
+rect.selected.normalBlock {
+    fill: lightblue;
+    opacity: 1.0;
+}
+rect.selected.targetBlock {
+    fill: lightpink;
+    opacity: 1.0;
+}
+
+text {
+    font-family: sans-serif;
+    fill: black;
+}
+text.selected {
+    font-weight: bold;
+}
