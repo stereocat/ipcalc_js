@@ -4,7 +4,7 @@ import { Netmask } from 'netmask'
 
 Vue.use(Vuex)
 
-const initString = '127.0.0.1/32'
+const initString = '127.0.0.1/8'
 
 export default new Vuex.Store({
   state: {

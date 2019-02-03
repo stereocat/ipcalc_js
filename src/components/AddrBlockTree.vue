@@ -47,15 +47,9 @@ export default {
         return ['', '']
       }
       return [
-        this.cidrStr(this.network, this.prefixLength + 1), // head block
-        this.cidrStr(this.broadcast, this.prefixLength + 1) // tail block
+        this.cidrStr(this.ipBlock.base, this.prefixLength + 1), // head block
+        this.cidrStr(this.ipBlock.broadcast, this.prefixLength + 1) // tail block
       ]
-    },
-    headChildBlock () {
-      return this.childrenBlocks[0]
-    },
-    tailChildBlock () {
-      return this.childrenBlocks[1]
     },
     rootNode () {
       // convert to hierarchical Node object
@@ -75,7 +69,7 @@ export default {
       // watch both ipAddrString and ipBlock
       state => `${state.ipAddrString}/${state.ipBlock.bitmask}`,
       (newStr, oldStr) => {
-        console.log(`watch store: ${oldStr} -> ${newStr}`)
+        // console.log(`watch store: ${oldStr} -> ${newStr}`)
         this.treeView()
       }
     )

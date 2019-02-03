@@ -6,7 +6,7 @@
       <input type="text" id="ipAddr"
              v-model="inputString"
              v-on:change="updateIPAddressString"
-             placeholder="e.g. 127.0.0.1/32">
+             placeholder="e.g. 127.0.0.1/8">
     </form>
     <div id="input-warning" v-if="isInvalidInput" class="input-warning">
       There is invalid IP/Mask(or prefix length) input.
@@ -64,6 +64,8 @@ export default {
     updateIPAddressString () {
       this.validateInputString()
       if (!this.isInvalidInput) {
+        console.log('update by change input string')
+        // mutation
         this.ipAddrString(this.candidateIPAddrString)
         this.ipBlock(this.candidateIPBlock)
       }

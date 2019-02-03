@@ -6,9 +6,12 @@
       <tr v-for="(infoDef, index) in this.infoDefs"
           v-bind:key="infoDef.name"
           v-bind:class="index % 2 ? 'even-row' : 'odd-row'">
-        <td>{{ infoDef.name }}</td>
-        <td>{{ infoDef.value }}</td>
-        <td>{{ isNaN(infoDef.value) ? toBinary(infoDef.value) : ''}}</td>
+        <td class="name">{{ infoDef.name }}</td>
+        <td class="value">{{ infoDef.value }}</td>
+        <td class="binary">
+          <span class="bin-head">{{ infoDef.binary.head }}</span>
+          <span class="bin-tail">{{ infoDef.binary.tail }}</span>
+        </td>
       </tr>
     </table>
     <div class="debug" v-bind:style="{ display: debugDisplay }">
@@ -44,18 +47,31 @@ export default {
         { name: 'Previous CIDR Block', value: this.previousBlockString },
         { name: 'THIS CIDR Block', value: this.ipBlock.toString() },
         { name: 'Next CIDR Block', value: this.nextBlockString }
-      ]
+      ].map(d => this.makeInfoDef(d.name, d.value))
     },
     previousBlockString () {
-      const blockStr = this.previousBlock()
-      return blockStr ? blockStr.toString() : null
+      try {
+        return this.previousBlock().toString()
+      } catch {
+        return null
+      }
     },
     nextBlockString () {
-      const blockStr = this.nextBlock()
-      return blockStr ? blockStr.toString() : null
+      try {
+        return this.nextBlock().toString()
+      } catch {
+        return null
+      }
     }
   },
   methods: {
+    makeInfoDef (name, value) {
+      return {
+        name: name,
+        value: value,
+        binary: isNaN(value) ? this.toBinary(value) : { head: '', tail: '' }
+      }
+    },
     previousBlock () {
       const prevBlock = this.ipBlock.next(-1)
       if (ip.toLong(prevBlock.base) > ip.toLong(this.ipBlock.base)) {
@@ -70,8 +86,31 @@ export default {
       }
       return nextBlock
     },
-    toBinary (addrString) {
-      return `TBA: convert ${addrString} to binary` // TODO
+    toBinary (dottedStr) {
+      const matches = /([\d.]+)\/(\d+)/.exec(dottedStr)
+      if (matches) {
+        dottedStr = matches[1] // x.x.x.x/mm => x.x.x.x
+      }
+      try {
+        const buf = ip.toBuffer(dottedStr)
+        const octets = []
+        for (const b of buf) {
+          octets.push(`00000000${Number(b).toString(2)}`.slice(-8))
+        }
+        const binDottedStr = octets.join('.')
+        const prefixLength = this.ipBlock.bitmask
+        if (prefixLength > 0) {
+          const sep = prefixLength + Math.floor((prefixLength - 1) / 8)
+          const headStr = binDottedStr.slice(0, sep)
+          const tailStr = binDottedStr.slice(sep)
+          return { head: headStr, tail: tailStr }
+        } else {
+          return { head: '', tail: binDottedStr }
+        }
+      } catch (err) {
+        console.log('error in toBinary()')
+        return { head: '', tail: '' }
+      }
     }
   }
 }
@@ -98,5 +137,11 @@ tr.odd-row {
 }
 td.value td.binary {
   font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+}
+.bin-head {
+  background-color: lemonchiffon;
+}
+.bin-tail {
+  font-weight: bold;
 }
 </style>
