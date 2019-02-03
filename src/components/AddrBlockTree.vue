@@ -3,7 +3,7 @@
     <div class="debug">
       [AddrBlockTree.vue debug]
       ip address: {{ ipAddrString }}
-      ip block: {{ ipBlock.toString() }}
+      ip block: {{ selfBlock }}
     </div>
   </div>
 </template>
@@ -26,24 +26,27 @@ export default {
   },
   computed: {
     ...mapGetters(['ipAddrString', 'ipBlock']),
-    length () {
+    prefixLength () {
       return this.ipBlock.bitmask
     },
+    selfBlock () {
+      return this.ipBlock.toString()
+    },
     parentBlock () {
-      if (this.length < 1) {
+      if (this.prefixLength < 1) {
         console.log('parent block does not exists (this is maximum block)')
         return null
       }
-      return this.cidrStr(this.ipAddrString, this.length - 1)
+      return this.cidrStr(this.ipAddrString, this.prefixLength - 1)
     },
     childrenBlocks () {
-      if (this.length > 31) {
+      if (this.prefixLength > 31) {
         console.log('children blocks does not exist (this is minimum block)')
         return ['', '']
       }
       return [
-        this.cidrStr(this.network, this.length + 1), // head block
-        this.cidrStr(this.broadcast, this.length + 1) // tail block
+        this.cidrStr(this.network, this.prefixLength + 1), // head block
+        this.cidrStr(this.broadcast, this.prefixLength + 1) // tail block
       ]
     },
     headChildBlock () {
@@ -54,14 +57,9 @@ export default {
     },
     rootNode () {
       // convert to hierarchical Node object
-      const rootCidrBlock = this.parentBlock || this.ipBlock.toString()
+      const rootCidrBlock = this.parentBlock || this.selfBlock
       return hierarchy(this.buildAddrTree(rootCidrBlock, this.blockLayerNum))
         .sum(d => d.size)
-    }
-  },
-  watch: {
-    ipAddrString () {
-      this.treeView()
     }
   },
   mounted () {
@@ -71,7 +69,14 @@ export default {
       .attr('height', this.height)
       .append('g')
       .attr('transform', 'scale(0.9, 0.9)')
-    this.treeView()
+    this.$store.watch(
+      // watch both ipAddrString and ipBlock
+      state => `${state.ipAddrString}/${state.ipBlock.bitmask}`,
+      (newStr, oldStr) => {
+        console.log(`watch store: ${oldStr} -> ${newStr}`)
+        this.treeView()
+      }
+    )
   },
   methods: {
     cidrStr (addrStr, length) {
@@ -94,7 +99,7 @@ export default {
       const layoutedNodeTree = treemapLayout(this.rootNode)
 
       // aliases, to refer in attr lambda
-      const targetBlock = this.cidrBlock
+      const targetBlock = this.selfBlock
 
       // rectangles (NodeTree map)
       const svgRects = this.svg
@@ -143,7 +148,6 @@ export default {
         .text(d => d.data.name)
     },
     buildAddrTree (cidrStr, layerNum) {
-      console.log('buildAddrTree', cidrStr, layerNum)
       const subnet = ip.cidrSubnet(cidrStr)
       const nwAddr = subnet.networkAddress
       const bcAddr = subnet.broadcastAddress
