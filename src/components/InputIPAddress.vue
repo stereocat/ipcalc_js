@@ -1,5 +1,5 @@
 <template>
-  <div id="inputIPAddress">
+  <div id="input-ip-address">
     <h2>Input IP/Mask</h2>
     <form onsubmit="return false">
       <input type="text" id="ipAddr"

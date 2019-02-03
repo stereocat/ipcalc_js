@@ -8,6 +8,7 @@ const initAddr = '127.0.0.1'
 const initPrefixLength = 8
 
 export default new Vuex.Store({
+  strict: process.env.NODE_ENV !== 'production',
   state: {
     ipAddrString: initAddr,
     ipBlock: new Netmask(`${initAddr}/${initPrefixLength}`)

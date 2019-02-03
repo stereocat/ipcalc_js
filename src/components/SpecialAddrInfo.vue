@@ -1,5 +1,5 @@
 <template>
-  <div id="special-use-addr-info">
+  <div id="special-addr-info">
     <transition>
       <div class="addr-info"
            v-if="containsSpecialBlock">
@@ -16,7 +16,7 @@
     <transition>
       <div class="addr-info"
            v-if="containedSpecialBlock && !foundSameBlock">
-        THIS block was contained by special use address block:
+        THIS block is contained by special use address block:
         <strong>{{ containedSpecialBlock.addrBlock }}</strong>
         ({{ containedSpecialBlock.name }}).
         See:

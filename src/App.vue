@@ -32,6 +32,7 @@ export default {
   }
 }
 </script>
+
 <style>
 #app {
   padding: 1em;
