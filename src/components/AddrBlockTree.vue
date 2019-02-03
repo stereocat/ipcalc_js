@@ -9,12 +9,13 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import ip from 'ip'
 import { select } from 'd3-selection'
 import { hierarchy, treemap, treemapSlice } from 'd3-hierarchy'
+import '../css/addr-tree.css'
 
 export default {
-  props: ['ipAddrString', 'ipBlock'],
   data () {
     return {
       height: 400,
@@ -24,6 +25,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['ipAddrString', 'ipBlock']),
     length () {
       return this.ipBlock.bitmask
     },

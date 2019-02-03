@@ -12,17 +12,16 @@
     </div>
     <div class="debug">
       [InputIPAddress.vue debug]
-      input string: {{ inputString }},
-      ip: {{ ipAddrString.toString() }},
+      input string: {{ inputString }}
     </div>
   </div>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import { Netmask } from 'netmask'
 
 export default {
-  props: ['ipAddrString', 'ipBlock'],
   data () {
     return {
       inputString: '',
@@ -32,6 +31,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['ipAddrString', 'ipBlock']),
     validateWithNetmask () {
       try {
         this.candidateIPBlock = new Netmask(this.inputString)
@@ -62,7 +62,8 @@ export default {
     updateIPAddressString () {
       this.validateInputString()
       if (!this.isInvalidInput) {
-        this.$emit('updateInput', this.candidateIPAddrString, this.candidateIPBlock)
+        this.ipAddrString(this.candidateIPAddrString)
+        this.ipBlock(this.candidateIPBlock)
       }
     }
   }

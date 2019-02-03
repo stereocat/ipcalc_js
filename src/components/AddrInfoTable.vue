@@ -14,23 +14,16 @@
       [AddrInfoTable.vue debug]
       ip addr: {{ ipAddrString }}, mask: {{ ipBlock.mask }}
     </div>
-    <AddrBlockTree
-      v-bind:ip-addr-string="ipAddrString"
-      v-bind:ip-block="ipBlock" />
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import ip from 'ip'
-import AddrBlockTree from './AddrBlockTree'
-import '../css/addr-tree.css'
 
 export default {
-  props: ['ipAddrString', 'ipBlock'],
-  components: {
-    AddrBlockTree
-  },
   computed: {
+    ...mapGetters(['ipAddrString', 'ipBlock']),
     infoDefs () {
       return [
         { name: 'IP Address', value: this.ipAddrString },
