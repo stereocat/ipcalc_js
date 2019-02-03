@@ -2,10 +2,7 @@ const express = require('express')
 const app = express()
 
 app.set('port', (process.env.PORT || 3000)) // process.env.PORT for Heroku
-app.use('/', express.static('dist'))
-app.get('*', function(req, res) {
-  res.redirect(302, '/index.html')
-})
+app.use('/', express.static('./dist'))
 
 const server = app.listen(app.get('port'), () => {
   const host = server.address().address
