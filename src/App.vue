@@ -3,6 +3,7 @@
     <IPCalcHeader />
     <InputIPAddress />
     <AddrInfoTable />
+    <SpecialAddrInfo />
     <AddrBlockTree />
   </div>
 </template>
@@ -11,6 +12,7 @@
 import IPCalcHeader from './components/IPCalcHeader'
 import InputIPAddress from './components/InputIPAddress'
 import AddrInfoTable from './components/AddrInfoTable'
+import SpecialAddrInfo from './components/SpecialAddrInfo'
 import AddrBlockTree from './components/AddrBlockTree'
 
 export default {
@@ -19,6 +21,7 @@ export default {
     IPCalcHeader,
     InputIPAddress,
     AddrInfoTable,
+    SpecialAddrInfo,
     AddrBlockTree
   },
   methods: {
@@ -31,6 +34,7 @@ export default {
 </script>
 <style>
 #app {
+  padding: 1em;
 }
 .debug {
   background-color: gainsboro;

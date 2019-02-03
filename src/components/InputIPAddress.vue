@@ -8,9 +8,11 @@
              v-on:change="updateIPAddressString"
              placeholder="e.g. 127.0.0.1/8">
     </form>
-    <div id="input-warning" v-if="isInvalidInput" class="input-warning">
-      There is invalid IP/Mask(or prefix length) input.
-    </div>
+    <transition>
+      <div id="input-warning" v-if="isInvalidInput" class="input-warning">
+        There is invalid IP/Mask(or prefix length) input.
+      </div>
+    </transition>
     <div class="debug" v-bind:style="{ display: debugDisplay }">
       [InputIPAddress.vue debug]
       input string: {{ inputString }}
@@ -102,5 +104,11 @@ div.input-warning {
   padding: 5px;
   background-color: lavenderblush;
   margin: 0.2em;
+}
+.v-enter, .v-leave-to {
+  opacity: 0;
+}
+.v-enter-active, .v-leave-active {
+  transition: opacity .5s;
 }
 </style>

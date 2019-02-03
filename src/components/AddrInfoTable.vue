@@ -121,7 +121,9 @@ table, td, th {
   border: 1px darkgray solid;
   border-collapse: collapse;
 }
-
+table {
+  margin: 1em;
+}
 th {
   color: white;
   background-color: gray;
