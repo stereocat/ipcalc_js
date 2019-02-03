@@ -1,6 +1,7 @@
 <template>
   <div id="addr-block-tree">
-    <div class="debug">
+    <h2>Address Block Tree</h2>
+    <div class="debug" v-bind:style="{ display: debugDisplay }">
       [AddrBlockTree.vue debug]
       ip address: {{ ipAddrString }}
       ip block: {{ selfBlock }}
@@ -18,6 +19,7 @@ import '../css/addr-tree.css'
 export default {
   data () {
     return {
+      debugDisplay: 'none',
       height: 400,
       width: 500,
       blockLayerNum: 2,

@@ -1,5 +1,6 @@
 <template>
   <div id="inputIPAddress">
+    <h2>Input IP/Mask</h2>
     <form onsubmit="return false">
       <label for="ipAddr">IP/Mask : </label>
       <input type="text" id="ipAddr"
@@ -10,7 +11,7 @@
     <div id="input-warning" v-if="isInvalidInput" class="input-warning">
       There is invalid IP/Mask(or prefix length) input.
     </div>
-    <div class="debug">
+    <div class="debug" v-bind:style="{ display: debugDisplay }">
       [InputIPAddress.vue debug]
       input string: {{ inputString }}
     </div>
@@ -24,6 +25,7 @@ import { Netmask } from 'netmask'
 export default {
   data () {
     return {
+      debugDisplay: 'none',
       inputString: '',
       candidateIPAddrString: '',
       candidateIPBlock: null,

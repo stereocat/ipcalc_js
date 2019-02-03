@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <IPCalcHeader />
     <InputIPAddress />
     <AddrInfoTable />
     <AddrBlockTree />
@@ -7,6 +8,7 @@
 </template>
 
 <script>
+import IPCalcHeader from './components/IPCalcHeader'
 import InputIPAddress from './components/InputIPAddress'
 import AddrInfoTable from './components/AddrInfoTable'
 import AddrBlockTree from './components/AddrBlockTree'
@@ -14,6 +16,7 @@ import AddrBlockTree from './components/AddrBlockTree'
 export default {
   name: 'app',
   components: {
+    IPCalcHeader,
     InputIPAddress,
     AddrInfoTable,
     AddrBlockTree

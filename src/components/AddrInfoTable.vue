@@ -1,5 +1,6 @@
 <template>
   <div id="addr-info-table">
+    <h2>Calculated Values</h2>
     <table>
       <tr><th>Name</th><th>Value</th><th>Binary</th></tr>
       <tr v-for="(infoDef, index) in this.infoDefs"
@@ -10,7 +11,7 @@
         <td>{{ isNaN(infoDef.value) ? toBinary(infoDef.value) : ''}}</td>
       </tr>
     </table>
-    <div class="debug">
+    <div class="debug" v-bind:style="{ display: debugDisplay }">
       [AddrInfoTable.vue debug]
       ip addr: {{ ipAddrString }}, mask: {{ ipBlock.mask }}
     </div>
@@ -22,6 +23,11 @@ import { mapGetters } from 'vuex'
 import ip from 'ip'
 
 export default {
+  data () {
+    return {
+      debugDisplay: 'none'
+    }
+  },
   computed: {
     ...mapGetters(['ipAddrString', 'ipBlock']),
     infoDefs () {
