@@ -40,13 +40,13 @@ export default {
         { name: 'Subnet Mask', value: this.ipBlock.mask },
         { name: 'Wild Card (Host Mask)', value: this.ipBlock.hostmask },
         { name: 'Network Address', value: this.ipBlock.base },
-        { name: 'Broadcast Address', value: this.ipBlock.broadcast },
         { name: 'First Host Address', value: this.ipBlock.first },
         { name: 'Last Host Address', value: this.ipBlock.last },
-        { name: 'Block Size (Number of Addresses)', value: this.ipBlock.size },
+        { name: 'Broadcast Address', value: this.ipBlock.broadcast },
         { name: 'Previous CIDR Block', value: this.previousBlockString },
         { name: 'THIS CIDR Block', value: this.ipBlock.toString() },
-        { name: 'Next CIDR Block', value: this.nextBlockString }
+        { name: 'Next CIDR Block', value: this.nextBlockString },
+        { name: 'Block Size (Number of Addresses)', value: this.ipBlock.size }
       ].map(d => this.makeInfoDef(d.name, d.value))
     },
     previousBlockString () {

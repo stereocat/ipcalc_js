@@ -4,12 +4,13 @@ import { Netmask } from 'netmask'
 
 Vue.use(Vuex)
 
-const initString = '127.0.0.1/8'
+const initAddr = '127.0.0.1'
+const initPrefixLength = 8
 
 export default new Vuex.Store({
   state: {
-    ipAddrString: initString,
-    ipBlock: new Netmask(initString)
+    ipAddrString: initAddr,
+    ipBlock: new Netmask(`${initAddr}/${initPrefixLength}`)
   },
   getters: {
     ipAddrString (state) {

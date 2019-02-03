@@ -2,7 +2,6 @@
   <div id="inputIPAddress">
     <h2>Input IP/Mask</h2>
     <form onsubmit="return false">
-      <label for="ipAddr">IP/Mask : </label>
       <input type="text" id="ipAddr"
              v-model="inputString"
              v-on:change="updateIPAddressString"
