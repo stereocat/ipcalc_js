@@ -4,7 +4,7 @@
     <form onsubmit="return false">
       <input type="text" id="ipAddr"
              v-model="inputString"
-             v-on:change="updateIPAddressString"
+             v-on:keyup="updateIPAddressString"
              placeholder="e.g. 127.0.0.1/8">
     </form>
     <transition>
@@ -84,7 +84,7 @@ input{
   font-size: 1.5em;
   width: 20em;
   height: 1.1em;
-  padding: 5px;
+  padding: 5px 20px;
   font-family: Arial, sans-serif;
   color: #aaa;
   border: solid 2px #ccc;
@@ -96,6 +96,8 @@ input{
 }
 input:focus {
   outline: 0;
+  color: #585858;
+  background-color: lightgoldenrodyellow;
   border:solid 2px #EEA34A;
 }
 div.input-warning {

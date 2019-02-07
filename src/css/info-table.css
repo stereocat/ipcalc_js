@@ -1,0 +1,33 @@
+table, td, th {
+    border: 1px darkgray solid;
+    border-collapse: collapse;
+}
+table {
+    margin: 1em;
+}
+th {
+    color: white;
+    background-color: gray;
+}
+td {
+    padding: 0.2em 1em;
+}
+tr.even-row {
+    background-color: white;
+}
+tr.odd-row {
+    background-color: ghostwhite;
+}
+
+td.value td.binary {
+    font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+}
+.bin-head {
+    background-color: #D8F6CE;
+}
+.bin-tail {
+    font-weight: bold;
+}
+.literal-head {
+    margin-right: 0.1em;
+}

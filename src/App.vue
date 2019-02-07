@@ -2,7 +2,8 @@
   <div id="app">
     <IPCalcHeader />
     <InputIPAddress />
-    <AddrInfoTable />
+    <IPAddrInfoTable />
+    <NetmaskInfoTable />
     <SpecialAddrInfo />
     <AddrBlockTree />
   </div>
@@ -11,7 +12,8 @@
 <script>
 import IPCalcHeader from './components/IPCalcHeader'
 import InputIPAddress from './components/InputIPAddress'
-import AddrInfoTable from './components/AddrInfoTable'
+import IPAddrInfoTable from './components/IPAddrInfoTable'
+import NetmaskInfoTable from './components/NetmaskInfoTable'
 import SpecialAddrInfo from './components/SpecialAddrInfo'
 import AddrBlockTree from './components/AddrBlockTree'
 
@@ -20,15 +22,10 @@ export default {
   components: {
     IPCalcHeader,
     InputIPAddress,
-    AddrInfoTable,
+    IPAddrInfoTable,
+    NetmaskInfoTable,
     SpecialAddrInfo,
     AddrBlockTree
-  },
-  methods: {
-    updateInput (ipAddrString, ipBlock) {
-      this.ipAddrString = ipAddrString
-      this.ipBlock = ipBlock
-    }
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
-  <div id="addr-info-table">
-    <h2>Calculated Values</h2>
+  <div id="netmask-info-table">
+    <h2>Netmask, Related Address Blocks</h2>
     <table>
       <tr><th>Name</th><th>Value</th><th>Binary</th></tr>
       <tr v-for="(infoDef, index) in this.infoDefs"
@@ -69,7 +69,7 @@ export default {
       return {
         name: name,
         value: value,
-        binary: isNaN(value) ? this.toBinary(value) : { head: '', tail: '' }
+        binary: this.toBinary(value)
       }
     },
     previousBlock () {
@@ -87,9 +87,12 @@ export default {
       return nextBlock
     },
     toBinary (dottedStr) {
-      const matches = /([\d.]+)\/(\d+)/.exec(dottedStr)
+      const nullValue = { head: '', tail: '' }
+      const matches = /(\d+\.\d+\.\d+\.\d+)(:?\/(\d+))?/.exec(dottedStr)
       if (matches) {
         dottedStr = matches[1] // x.x.x.x/mm => x.x.x.x
+      } else {
+        return nullValue
       }
       try {
         const buf = ip.toBuffer(dottedStr)
@@ -109,41 +112,12 @@ export default {
         }
       } catch (err) {
         console.log('error in toBinary()')
-        return { head: '', tail: '' }
+        return nullValue
       }
     }
   }
 }
 </script>
 
-<style scoped>
-table, td, th {
-  border: 1px darkgray solid;
-  border-collapse: collapse;
-}
-table {
-  margin: 1em;
-}
-th {
-  color: white;
-  background-color: gray;
-}
-td {
-  padding: 0.2em 1em;
-}
-tr.even-row {
-  background-color: white;
-}
-tr.odd-row {
-  background-color: ghostwhite;
-}
-td.value td.binary {
-  font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
-}
-.bin-head {
-  background-color: lemonchiffon;
-}
-.bin-tail {
-  font-weight: bold;
-}
+<style src="../css/info-table.css" scoped>
 </style>
