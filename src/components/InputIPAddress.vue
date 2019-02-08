@@ -7,6 +7,11 @@
              v-on:keyup="updateIPAddressString"
              placeholder="e.g. 127.0.0.1/8">
     </form>
+    <p>
+      <a href="#ip-addr-info-table">IP</a>,
+      <a href="#netmask-info-table">Netmask</a>,
+      <a href="#addr-block-tree">Addr Block Tree</a>
+    </p>
     <transition>
       <div id="input-warning" v-if="isInvalidInput" class="input-warning">
         There is invalid IP/Mask(or prefix length) input.

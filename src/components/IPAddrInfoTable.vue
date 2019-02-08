@@ -1,6 +1,9 @@
 <template>
   <div id="ip-addr-info-table">
-    <h2>IP Address</h2>
+    <h2>
+      IP Address
+      <a href="#input-ip-address" class="header-anchor">†</a>
+    </h2>
     <table>
       <tr><th>Name</th><th>Value</th></tr>
       <tr v-for="(ipNotation, index) in this.ipNotations"

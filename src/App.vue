@@ -37,4 +37,11 @@ export default {
 .debug {
   background-color: gainsboro;
 }
+.header-anchor {
+  font-size: xx-small;
+  vertical-align: super;
+}
+.header-anchor:link {
+  text-decoration: none;
+}
 </style>

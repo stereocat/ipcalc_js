@@ -1,6 +1,9 @@
 <template>
   <div id="addr-block-tree">
-    <h2>Address Block Tree</h2>
+    <h2>
+      Address Block Tree
+      <a href="#input-ip-address" class="header-anchor">†</a>
+    </h2>
     <div class="debug" v-bind:style="{ display: debugDisplay }">
       [AddrBlockTree.vue debug]
       ip address: {{ ipAddrString }}
@@ -97,17 +100,14 @@ export default {
       // aliases, to refer in attr lambda
       const targetBlock = this.selfBlock
 
+      function setClass (d) {
+        return d.data.name === targetBlock ? 'targetBlock' : 'normalBlock'
+      }
+
       // rectangles (NodeTree map)
       const svgRects = this.svg
         .selectAll('rect')
         .data(layoutedNodeTree.descendants())
-
-      function setClass (d) {
-        return [
-          d.data.name,
-          d.data.name === targetBlock ? 'targetBlock' : 'normalBlock'
-        ].join(' ')
-      }
       svgRects.enter()
         .append('rect')
         .attr('class', setClass)
@@ -148,16 +148,16 @@ export default {
       const nwAddr = subnet.networkAddress
       const bcAddr = subnet.broadcastAddress
       const childLength = subnet.subnetMaskLength + 1
-      const headChildNWAddr = ip.cidrSubnet([nwAddr, childLength].join('/')).networkAddress
-      const tailChildNWAddr = ip.cidrSubnet([bcAddr, childLength].join('/')).networkAddress
-      return layerNum === 0 || subnet.subnetMaskLength === 32 ? {
-        name: cidrStr,
-        size: subnet.length
-      } : {
+      const headChildNWAddr = ip.cidrSubnet(`${nwAddr}/${childLength}`).networkAddress
+      const tailChildNWAddr = ip.cidrSubnet(`${bcAddr}/${childLength}`).networkAddress
+      if (layerNum === 0 || subnet.subnetMaskLength === 32) {
+        return { name: cidrStr, size: subnet.length }
+      }
+      return {
         name: cidrStr,
         children: [
-          this.buildAddrTree([headChildNWAddr, childLength].join('/'), layerNum - 1),
-          this.buildAddrTree([tailChildNWAddr, childLength].join('/'), layerNum - 1)
+          this.buildAddrTree(`${headChildNWAddr}/${childLength}`, layerNum - 1),
+          this.buildAddrTree(`${tailChildNWAddr}/${childLength}`, layerNum - 1)
         ]
       }
     }

@@ -1,6 +1,9 @@
 <template>
   <div id="netmask-info-table">
-    <h2>Netmask, Related Address Blocks</h2>
+    <h2>
+      Netmask, Related Address Blocks
+      <a href="#input-ip-address" class="header-anchor">†</a>
+    </h2>
     <table>
       <tr><th>Name</th><th>Value</th><th>Binary</th></tr>
       <tr v-for="(infoDef, index) in this.infoDefs"

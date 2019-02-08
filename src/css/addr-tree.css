@@ -13,6 +13,6 @@ text {
     font-family: sans-serif;
     fill: black;
 }
-text.selected {
+text.targetBlock {
     font-weight: bold;
 }
