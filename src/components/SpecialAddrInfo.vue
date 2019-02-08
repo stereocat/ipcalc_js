@@ -1,39 +1,27 @@
 <template>
   <div id="special-addr-info">
-    <transition>
-      <div class="addr-info"
-           v-if="containsSpecialBlock">
-        THIS block contains special use address block:
-        <strong>{{ containsSpecialBlock.addrBlock }}</strong>
-        ({{ containsSpecialBlock.name }}).
-        See:
-        <a v-bind:href="`https://tools.ietf.org/html/rfc${containsSpecialBlock.rfc}`"
-           target="_blank" rel="noopener noreferrer">
-          RFC{{ containsSpecialBlock.rfc }}
-        </a>
-      </div>
-    </transition>
-    <transition>
-      <div class="addr-info"
-           v-if="containedSpecialBlock && !foundSameBlock">
-        THIS block is contained by special use address block:
-        <strong>{{ containedSpecialBlock.addrBlock }}</strong>
-        ({{ containedSpecialBlock.name }}).
-        See:
-        <a v-bind:href="`https://tools.ietf.org/html/rfc${containedSpecialBlock.rfc}`"
-           target="_blank" rel="noopener noreferrer">
-          RFC{{ containedSpecialBlock.rfc }}
-        </a>
-      </div>
-    </transition>
+    <AddrInfoBlock
+      v-if="containsSpecialBlock"
+      v-bind:block="containsSpecialBlock">
+      THIS block contains special use address block:
+    </AddrInfoBlock>
+    <AddrInfoBlock
+      v-if="containedSpecialBlock && !foundSameBlock"
+      v-bind:block="containedSpecialBlock">
+      THIS block is contained by special use address block:
+    </AddrInfoBlock>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import { Netmask } from 'netmask'
+import AddrInfoBlock from './AddrInfoBlock'
 
 export default {
+  components: {
+    AddrInfoBlock
+  },
   data () {
     return {
       blockList: [
@@ -86,19 +74,4 @@ export default {
 </script>
 
 <style scoped>
-div.addr-info {
-  border: 3px darkgreen solid;
-  padding: 0.5em;
-  background-color: mintcream;
-  margin: 0.2em;
-}
-div strong {
-  text-decoration: underline;
-}
-.v-enter, .v-leave-to {
-  opacity: 0;
-}
-.v-enter-active, .v-leave-active {
-  transition: opacity .5s;
-}
 </style>

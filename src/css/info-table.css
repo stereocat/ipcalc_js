@@ -16,7 +16,7 @@ table tr:hover {
     background-color: seashell;
 }
 table td:hover {
-    background-color: lavenderblush;
+    background-color: lightyellow;
 }
 tr.even-row {
     background-color: white;

@@ -2,7 +2,7 @@
   <div id="app">
     <IPCalcHeader />
     <InputIPAddress />
-    <el-collapse>
+    <el-collapse v-model="activeNames">
       <el-collapse-item title="IP Info Table" name="ip-info">
         <IPAddrInfoTable />
       </el-collapse-item>
@@ -34,13 +34,19 @@ export default {
     NetmaskInfoTable,
     SpecialAddrInfo,
     AddrBlockTree
+  },
+  data () {
+    return {
+      activeNames: ['ip-info', 'netmask-info', 'address-block-tree']
+    }
   }
 }
 </script>
 
 <style>
 #app {
-  padding: 1em;
+  padding-left: 60px;
+  padding-right: 60px;
 }
 .debug {
   background-color: gainsboro;

@@ -67,8 +67,8 @@ export default {
   methods: {
     cidrStr (addrStr, length) {
       try {
-        const subnet = ip.cidrSubnet([addrStr, length].join('/'))
-        return [subnet.networkAddress, length].join('/')
+        const subnet = ip.cidrSubnet(`${addrStr}/${length}`)
+        return `${subnet.networkAddress}/${length}`
       } catch {
         return ''
       }
