@@ -1,12 +1,11 @@
 <template>
   <div id="input-ip-address">
     <h2>Input IP/Mask</h2>
-    <form onsubmit="return false">
-      <input type="text" id="ipAddr"
-             v-model="inputString"
-             v-on:keyup="updateIPAddressString"
-             placeholder="e.g. 127.0.0.1/8">
-    </form>
+    <el-input
+      size="large" autofocus
+      v-model="inputString"
+      v-on:keyup.native="updateIPAddressString"
+      placeholder="e.g. 127.0.0.1/8" />
     <p>
       <a href="#ip-addr-info-table">IP</a>,
       <a href="#netmask-info-table">Netmask</a>,
@@ -80,30 +79,6 @@ export default {
 </script>
 
 <style scoped>
-form {
-  margin: 5px;
-  padding: 5px;
-}
-input{
-  font-size: 1.5em;
-  width: 20em;
-  height: 1.1em;
-  padding: 5px 20px;
-  font-family: Arial, sans-serif;
-  color: #aaa;
-  border: solid 2px #ccc;
-  margin: 5px;
-  /* rounded corner*/
-  -webkit-border-radius: 30px;
-  -moz-border-radius: 30px;
-  border-radius: 30px;
-}
-input:focus {
-  outline: 0;
-  color: #585858;
-  background-color: lightgoldenrodyellow;
-  border:solid 2px #EEA34A;
-}
 div.input-warning {
   border: 3px pink solid;
   padding: 5px;
