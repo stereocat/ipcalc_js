@@ -15,6 +15,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import ip from 'ip'
+import { Netmask } from 'netmask'
 import { select } from 'd3-selection'
 import { hierarchy, treemap, treemapSlice } from 'd3-hierarchy'
 import '../css/addr-tree.css'
@@ -23,9 +24,9 @@ export default {
   data () {
     return {
       debugDisplay: 'none',
-      height: 400,
-      width: 500,
-      blockLayerNum: 2,
+      height: 600,
+      width: 400,
+      blockLayerNum: 3, // depth: parent(1) + children(2)
       svg: null
     }
   },
@@ -44,19 +45,9 @@ export default {
       }
       return this.cidrStr(this.ipAddrString, this.prefixLength - 1)
     },
-    childrenBlocks () {
-      if (this.prefixLength > 31) {
-        console.log('children blocks does not exist (this is minimum block)')
-        return ['', '']
-      }
-      return [
-        this.cidrStr(this.ipBlock.base, this.prefixLength + 1), // head block
-        this.cidrStr(this.ipBlock.broadcast, this.prefixLength + 1) // tail block
-      ]
-    },
     rootNode () {
       // convert to hierarchical Node object
-      const rootCidrBlock = this.parentBlock || this.selfBlock
+      const rootCidrBlock = this.findOriginBlock()
       return hierarchy(this.buildAddrTree(rootCidrBlock, this.blockLayerNum))
         .sum(d => d.size)
     }
@@ -86,8 +77,16 @@ export default {
         return ''
       }
     },
+    findOriginBlock () {
+      const parentDepth = this.blockLayerNum - (32 - this.ipBlock.bitmask)
+      if (parentDepth > 1) {
+        const grandParent = new Netmask(`${this.ipBlock.base}/${this.ipBlock.bitmask - parentDepth}`)
+        return grandParent.toString()
+      }
+      return this.parentBlock || this.selfBlock
+    },
     treeView () {
-      const padding = this.height / 20
+      const padding = this.height / 30
 
       const treemapLayout = treemap()
         .tile(treemapSlice)

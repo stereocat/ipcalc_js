@@ -70,7 +70,6 @@ export default {
     updateIPAddressString () {
       this.validateInputString()
       if (!this.isInvalidInput) {
-        console.log('update by change input string')
         // mutation
         this.ipAddrString(this.candidateIPAddrString)
         this.ipBlock(this.candidateIPBlock)
