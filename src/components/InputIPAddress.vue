@@ -1,16 +1,10 @@
 <template>
   <div id="input-ip-address">
-    <h2>Input IP/Mask</h2>
     <el-input
       size="large" autofocus
       v-model="inputString"
       v-on:keyup.native="updateIPAddressString"
       placeholder="e.g. 127.0.0.1/8" />
-    <p>
-      <a href="#ip-addr-info-table">IP</a>,
-      <a href="#netmask-info-table">Netmask</a>,
-      <a href="#addr-block-tree">Addr Block Tree</a>
-    </p>
     <transition>
       <div id="input-warning" v-if="isInvalidInput" class="input-warning">
         There is invalid IP/Mask(or prefix length) input.

@@ -2,10 +2,18 @@
   <div id="app">
     <IPCalcHeader />
     <InputIPAddress />
-    <IPAddrInfoTable />
-    <NetmaskInfoTable />
-    <SpecialAddrInfo />
-    <AddrBlockTree />
+    <el-collapse>
+      <el-collapse-item title="IP Info Table" name="ip-info">
+        <IPAddrInfoTable />
+      </el-collapse-item>
+      <el-collapse-item title="Netmask Info Table" name="netmask-info">
+        <NetmaskInfoTable />
+        <SpecialAddrInfo />
+      </el-collapse-item>
+      <el-collapse-item title="Address Block Tree" name="address-block-tree">
+        <AddrBlockTree />
+      </el-collapse-item>
+    </el-collapse>
   </div>
 </template>
 

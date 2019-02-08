@@ -1,9 +1,5 @@
 <template>
   <div id="addr-block-tree">
-    <h2>
-      Address Block Tree
-      <a href="#input-ip-address" class="header-anchor">†</a>
-    </h2>
     <div class="debug" v-bind:style="{ display: debugDisplay }">
       [AddrBlockTree.vue debug]
       ip address: {{ ipAddrString }}
