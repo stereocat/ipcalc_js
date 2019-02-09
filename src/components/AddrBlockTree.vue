@@ -49,6 +49,9 @@ export default {
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height)
+    // make addr tree diagrams at first
+    this.treeView()
+    // add input watcher
     this.$store.watch(
       // watch both ipAddrString and ipBlock
       state => `${state.ipAddrString}/${this.prefixLength}`,
@@ -89,19 +92,14 @@ export default {
       // NOTICE: transposed x/y
 
       // rectangles (NodeTree map)
-      const svgRects = this.svg
+      const svgRect = this.svg
         .selectAll('rect')
         .data(layoutedNodeTree.descendants())
-      svgRects.enter()
+      const svgRectEnter = svgRect
+        .enter()
         .append('rect')
-        .attr('class', setClass)
-        .attr('x', d => d.y0)
-        .attr('y', d => d.x0)
-        .attr('width', d => d.y1 - d.y0)
-        .attr('height', d => d.x1 - d.x0)
-      svgRects.exit()
-        .remove()
-      svgRects
+      const svgRectUpdate = svgRectEnter.merge(svgRect)
+      svgRectUpdate
         .attr('class', setClass)
         .attr('x', d => d.y0)
         .attr('y', d => d.x0)
@@ -109,19 +107,13 @@ export default {
         .attr('height', d => d.x1 - d.x0)
 
       // text label
-      const svgTexts = this.svg.selectAll('text')
+      const svgText = this.svg.selectAll('text')
         .data(layoutedNodeTree.descendants())
-      svgTexts.enter()
+      const svgTextEnter = svgText
+        .enter()
         .append('text')
-        .attr('x', d => d.y0)
-        .attr('y', d => d.x0)
-        .attr('dx', 5)
-        .attr('dy', 15)
-        .attr('class', setClass)
-        .text(d => d.data.name)
-      svgTexts.exit()
-        .remove()
-      svgTexts
+      const svgTextUpdate = svgTextEnter.merge(svgText)
+      svgTextUpdate
         .attr('x', d => d.y0)
         .attr('y', d => d.x0)
         .attr('dx', 5)
