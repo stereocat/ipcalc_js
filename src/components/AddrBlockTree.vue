@@ -14,6 +14,8 @@ import ip from 'ip'
 import { Netmask } from 'netmask'
 import { select } from 'd3-selection'
 import { hierarchy, partition } from 'd3-hierarchy'
+import { transition } from 'd3-transition'
+import { easeElasticOut } from 'd3-ease'
 import '../css/addr-tree.css'
 
 export default {
@@ -40,8 +42,8 @@ export default {
     rootNode () {
       // convert to hierarchical Node object
       const rootCidrBlock = this.findOriginBlock()
-      return hierarchy(this.buildAddrTree(rootCidrBlock, this.blockLayerNum))
-        .sum(d => d.size)
+      const addrTreeData = this.buildAddrTree(rootCidrBlock, this.blockLayerNum)
+      return hierarchy(addrTreeData).sum(d => d.size)
     }
   },
   mounted () {
@@ -81,45 +83,66 @@ export default {
         .padding(10)
         .size([this.height, this.width])
     },
-    treeView () {
-      const layout = this.makeLayout()
-      const layoutedNodeTree = layout(this.rootNode)
-
-      const setClass = (d) => {
-        return d.data.name === this.selfBlock ? 'targetBlock' : 'normalBlock'
-      }
-
+    rectTransition () {
+      return transition()
+        .duration(500)
+        .ease(easeElasticOut)
+    },
+    setClass (d) {
+      return d.data.name === this.selfBlock ? 'targetBlock' : 'normalBlock'
+    },
+    setRectanglesForTransition () {
+      const p = 10
+      this.svg.selectAll('rect')
+        .attr('x', d => d.y0 + p)
+    },
+    createRectangles (data) {
       // NOTICE: transposed x/y
-
       // rectangles (NodeTree map)
       const svgRect = this.svg
         .selectAll('rect')
-        .data(layoutedNodeTree.descendants())
-      const svgRectEnter = svgRect
+        .data(data)
+      const svgRectEnter = svgRect // 1st time (if not exists rectangles)
         .enter()
         .append('rect')
-      const svgRectUpdate = svgRectEnter.merge(svgRect)
-      svgRectUpdate
-        .attr('class', setClass)
-        .attr('x', d => d.y0)
-        .attr('y', d => d.x0)
+      svgRect.merge(svgRectEnter)
+        .transition(this.rectTransition())
+        .delay((d, i) => i * 30)
+        .attr('class', this.setClass)
         .attr('width', d => d.y1 - d.y0)
         .attr('height', d => d.x1 - d.x0)
-
-      // text label
+        .attr('x', d => d.y0)
+        .attr('y', d => d.x0)
+    },
+    setLabelsForTransition () {
+      const p = 10
+      this.svg.selectAll('text')
+        .attr('x', d => d.y0 + p)
+    },
+    createLabels (data) {
+      // labels for rectangles (address block)
       const svgText = this.svg.selectAll('text')
-        .data(layoutedNodeTree.descendants())
-      const svgTextEnter = svgText
+        .data(data)
+      const svgTextEnter = svgText // 1st time (if not exists rectangles)
         .enter()
         .append('text')
-      const svgTextUpdate = svgTextEnter.merge(svgText)
-      svgTextUpdate
+      svgTextEnter.merge(svgText)
+        .transition(this.rectTransition())
+        .delay((d, i) => i * 25)
         .attr('x', d => d.y0)
         .attr('y', d => d.x0)
         .attr('dx', 5)
         .attr('dy', 15)
-        .attr('class', setClass)
+        .attr('class', this.setClass)
         .text(d => d.data.name)
+    },
+    treeView () {
+      const layout = this.makeLayout()
+      const layoutedNodeTree = layout(this.rootNode)
+      this.setRectanglesForTransition()
+      this.createRectangles(layoutedNodeTree.descendants())
+      this.setLabelsForTransition()
+      this.createLabels(layoutedNodeTree.descendants())
     },
     buildAddrTree (cidrStr, layerNum) {
       const subnet = ip.cidrSubnet(cidrStr)
