@@ -13,15 +13,15 @@ import { mapGetters } from 'vuex'
 import ip from 'ip'
 import { Netmask } from 'netmask'
 import { select } from 'd3-selection'
-import { hierarchy, treemap, treemapSlice } from 'd3-hierarchy'
+import { hierarchy, partition } from 'd3-hierarchy'
 import '../css/addr-tree.css'
 
 export default {
   data () {
     return {
       debugDisplay: 'none',
-      height: 600,
-      width: 400,
+      height: 400,
+      width: 600,
       blockLayerNum: 3, // depth: parent(1) + children(2)
       svg: null
     }
@@ -49,8 +49,6 @@ export default {
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height)
-      .append('g')
-      .attr('transform', 'scale(0.9, 0.9)')
     this.$store.watch(
       // watch both ipAddrString and ipBlock
       state => `${state.ipAddrString}/${this.prefixLength}`,
@@ -74,20 +72,21 @@ export default {
       const parentDepth = hostLength < this.blockLayerNum ? this.blockLayerNum - hostLength : 1
       return this.nParentBlock(parentDepth) || this.selfBlock
     },
-    treeView () {
-      const padding = this.height / 30
-
-      const treemapLayout = treemap()
-        .tile(treemapSlice)
+    makeLayout () {
+      return partition()
         .round(true)
-        .paddingOuter(padding)
-        .paddingInner(padding)
-        .size([this.width, this.height])
-      const layoutedNodeTree = treemapLayout(this.rootNode)
+        .padding(10)
+        .size([this.height, this.width])
+    },
+    treeView () {
+      const layout = this.makeLayout()
+      const layoutedNodeTree = layout(this.rootNode)
 
       const setClass = (d) => {
         return d.data.name === this.selfBlock ? 'targetBlock' : 'normalBlock'
       }
+
+      // NOTICE: transposed x/y
 
       // rectangles (NodeTree map)
       const svgRects = this.svg
@@ -96,35 +95,37 @@ export default {
       svgRects.enter()
         .append('rect')
         .attr('class', setClass)
-        .attr('x', d => d.x0)
-        .attr('y', d => d.y0)
-        .attr('width', d => d.x1 - d.x0)
-        .attr('height', d => d.y1 - d.y0)
+        .attr('x', d => d.y0)
+        .attr('y', d => d.x0)
+        .attr('width', d => d.y1 - d.y0)
+        .attr('height', d => d.x1 - d.x0)
       svgRects.exit()
         .remove()
       svgRects
         .attr('class', setClass)
-        .attr('x', d => d.x0)
-        .attr('y', d => d.y0)
-        .attr('width', d => d.x1 - d.x0)
-        .attr('height', d => d.y1 - d.y0)
+        .attr('x', d => d.y0)
+        .attr('y', d => d.x0)
+        .attr('width', d => d.y1 - d.y0)
+        .attr('height', d => d.x1 - d.x0)
 
       // text label
       const svgTexts = this.svg.selectAll('text')
         .data(layoutedNodeTree.descendants())
       svgTexts.enter()
         .append('text')
-        .attr('x', d => d.x0)
-        .attr('y', d => d.y0)
-        .attr('dy', padding * 0.8)
+        .attr('x', d => d.y0)
+        .attr('y', d => d.x0)
+        .attr('dx', 5)
+        .attr('dy', 15)
         .attr('class', setClass)
         .text(d => d.data.name)
       svgTexts.exit()
         .remove()
       svgTexts
-        .attr('x', d => d.x0)
-        .attr('y', d => d.y0)
-        .attr('dy', padding * 0.8)
+        .attr('x', d => d.y0)
+        .attr('y', d => d.x0)
+        .attr('dx', 5)
+        .attr('dy', 15)
         .attr('class', setClass)
         .text(d => d.data.name)
     },
