@@ -31,15 +31,11 @@ export default {
     prefixLength () {
       return this.ipBlock.bitmask
     },
+    networkAddress () {
+      return this.ipBlock.base
+    },
     selfBlock () {
       return this.ipBlock.toString()
-    },
-    parentBlock () {
-      if (this.prefixLength < 1) {
-        console.log('parent block does not exists (this is maximum block)')
-        return null
-      }
-      return this.cidrStr(this.ipAddrString, this.prefixLength - 1)
     },
     rootNode () {
       // convert to hierarchical Node object
@@ -57,7 +53,7 @@ export default {
       .attr('transform', 'scale(0.9, 0.9)')
     this.$store.watch(
       // watch both ipAddrString and ipBlock
-      state => `${state.ipAddrString}/${state.ipBlock.bitmask}`,
+      state => `${state.ipAddrString}/${this.prefixLength}`,
       (newStr, oldStr) => {
         // console.log(`watch store: ${oldStr} -> ${newStr}`)
         this.treeView()
@@ -65,21 +61,18 @@ export default {
     )
   },
   methods: {
-    cidrStr (addrStr, length) {
-      try {
-        const subnet = ip.cidrSubnet(`${addrStr}/${length}`)
-        return `${subnet.networkAddress}/${length}`
-      } catch {
-        return ''
+    nParentBlock (gen) {
+      if (this.prefixLength < gen) {
+        console.log(`${gen}-parent block does not exists (this is maximum block)`)
+        return null
       }
+      const parentBlock = new Netmask(`${this.networkAddress}/${this.prefixLength - gen}`)
+      return parentBlock.toString()
     },
     findOriginBlock () {
-      const parentDepth = this.blockLayerNum - (32 - this.ipBlock.bitmask)
-      if (parentDepth > 1) {
-        const grandParent = new Netmask(`${this.ipBlock.base}/${this.ipBlock.bitmask - parentDepth}`)
-        return grandParent.toString()
-      }
-      return this.parentBlock || this.selfBlock
+      const hostLength = 32 - this.prefixLength
+      const parentDepth = hostLength < this.blockLayerNum ? this.blockLayerNum - hostLength : 1
+      return this.nParentBlock(parentDepth) || this.selfBlock
     },
     treeView () {
       const padding = this.height / 30
@@ -92,11 +85,8 @@ export default {
         .size([this.width, this.height])
       const layoutedNodeTree = treemapLayout(this.rootNode)
 
-      // aliases, to refer in attr lambda
-      const targetBlock = this.selfBlock
-
-      function setClass (d) {
-        return d.data.name === targetBlock ? 'targetBlock' : 'normalBlock'
+      const setClass = (d) => {
+        return d.data.name === this.selfBlock ? 'targetBlock' : 'normalBlock'
       }
 
       // rectangles (NodeTree map)
