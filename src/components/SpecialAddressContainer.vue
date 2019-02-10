@@ -26,7 +26,7 @@ export default {
     SpecialAddressList
   },
   computed: {
-    ...mapGetters(['ipAddrString', 'ipBlock']),
+    ...mapGetters(['ipBlock']),
     containSpecialBlocks () {
       return blockList.filter(d => {
         return this.ipBlock.contains(d.addrBlock)

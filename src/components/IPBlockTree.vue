@@ -8,7 +8,6 @@
       v-bind:style="{ display: debugDisplay }"
     >
       [AddrBlockTree.vue debug]
-      ip address: {{ ipAddrString }}
       ip block: {{ selfBlock }}
     </div>
   </div>
@@ -35,7 +34,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['ipAddrString', 'ipBlock']),
+    ...mapGetters(['ipBlock']),
     prefixLength () {
       return this.ipBlock.bitmask
     },
@@ -102,7 +101,7 @@ export default {
       select(`rect[id='${d.data.name}']`)
         .classed('selected', true)
     },
-    removeHighlightToRect (d) {
+    removeHighlightFromRect (d) {
       select(`rect[id='${d.data.name}']`)
         .classed('selected', false)
     },
@@ -129,7 +128,7 @@ export default {
         .attr('id', d => `${d.data.name}`)
         .attr('class', this.setClass)
         .on('mouseover', this.addHighlightToRect)
-        .on('mouseout', this.removeHighlightToRect)
+        .on('mouseout', this.removeHighlightFromRect)
         .on('click', this.updateStateToBlock)
         .attr('rx', 5)
         .attr('ry', 5)
@@ -150,7 +149,7 @@ export default {
       svgTextEnter.merge(svgText)
         .attr('class', this.setClass)
         .on('mouseover', this.addHighlightToRect)
-        .on('mouseout', this.removeHighlightToRect)
+        .on('mouseout', this.removeHighlightFromRect)
         .on('click', this.updateStateToBlock)
         .transition(this.rectTransition())
         .delay((d, i) => i * 25)
