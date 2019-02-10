@@ -6,7 +6,7 @@
       v-on:keyup.native="updateIPAddressString"
       placeholder="e.g. 127.0.0.1/8" />
     <transition>
-      <div id="input-warning" v-if="isInvalidInput" class="input-warning">
+      <div id="input-warning" v-if="!validInput" class="input-warning">
         There is invalid IP/Mask(or prefix length) input.
       </div>
     </transition>
@@ -28,17 +28,19 @@ export default {
       inputString: '',
       candidateIPAddrString: '',
       candidateIPBlock: null,
-      isInvalidInput: false
+      validInput: true,
+      delayTimer: null
     }
   },
   methods: {
     ...mapMutations(['ipAddrString', 'ipBlock']),
-    validateWithNetmask () {
+    validateInputAsIPNetmask () {
       try {
         this.candidateIPBlock = new Netmask(this.inputString)
+        return true
       } catch {
         // Error if the Netmask cannot accept input.
-        this.isInvalidInput = true
+        return false
       }
     },
     extractIPAddrStringFromInput () {
@@ -48,25 +50,30 @@ export default {
         if (match[1].match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) {
           this.candidateIPAddrString = match[1]
         } else {
-          // abbreviations
+          // when used abbrev ip string (e.g. 192.168 => '192.168.0.0')
           this.candidateIPAddrString = this.candidateIPBlock.base
         }
       }
     },
     validateInputString () {
-      this.isInvalidInput = false
-      this.validateWithNetmask()
-      if (!this.isInvalidInput) {
+      this.validInput = this.validateInputAsIPNetmask()
+      if (this.validInput) {
         this.extractIPAddrStringFromInput()
       }
     },
     updateIPAddressString () {
+      // validate ASAP for each key input
       this.validateInputString()
-      if (!this.isInvalidInput) {
+      if (!this.validInput) {
+        return
+      }
+      // wait to update app state when finish input
+      clearTimeout(this.delayTimer)
+      this.delayTimer = setTimeout(() => {
         // mutation
         this.ipAddrString(this.candidateIPAddrString)
         this.ipBlock(this.candidateIPBlock)
-      }
+      }, 500)
     }
   }
 }
