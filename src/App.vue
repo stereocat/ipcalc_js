@@ -20,7 +20,7 @@
         title="Address Block Tree"
         name="address-block-tree"
       >
-        <IPAddressBlockTree />
+        <IPBlockTree />
       </el-collapse-item>
     </el-collapse>
   </div>
@@ -32,7 +32,7 @@ import AppInput from './components/AppInput'
 import IPAddressTable from './components/IPAddressTable'
 import NetmaskTable from './components/NetmaskTable'
 import SpecialAddressContainer from './components/SpecialAddressContainer'
-import IPAddressBlockTree from './components/IPAddressBlockTree'
+import IPBlockTree from './components/IPBlockTree'
 
 export default {
   name: 'app',
@@ -42,7 +42,7 @@ export default {
     IPAddressTable,
     NetmaskTable,
     SpecialAddressContainer,
-    IPAddressBlockTree
+    IPBlockTree
   },
   data () {
     return {
