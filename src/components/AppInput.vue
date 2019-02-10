@@ -6,12 +6,19 @@
       v-on:keyup.native="updateIPAddressString"
       placeholder="e.g. 127.0.0.1/8" />
     <transition>
-      <div id="input-warning" v-if="!validInput" class="input-warning">
-        <i class="el-icon-warning"></i>
+      <div
+        id="input-warning"
+        v-if="!validInput"
+        class="input-warning"
+      >
+        <i class="el-icon-warning" />
         There is invalid IP/Mask(or prefix length) input.
       </div>
     </transition>
-    <div class="debug" v-bind:style="{ display: debugDisplay }">
+    <div
+      class="debug"
+      v-bind:style="{ display: debugDisplay }"
+    >
       [InputIPAddress.vue debug]
       input string: {{ inputString }}
     </div>

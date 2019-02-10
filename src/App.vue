@@ -3,14 +3,23 @@
     <AppHeader />
     <AppInput />
     <el-collapse v-model="activeNames">
-      <el-collapse-item title="IP Info Table" name="ip-info">
+      <el-collapse-item
+        title="IP Info Table"
+        name="ip-info"
+      >
         <IPAddressTable />
       </el-collapse-item>
-      <el-collapse-item title="Netmask Info Table" name="netmask-info">
+      <el-collapse-item
+        title="Netmask Info Table"
+        name="netmask-info"
+      >
         <NetmaskTable />
         <SpecialAddressContainer />
       </el-collapse-item>
-      <el-collapse-item title="Address Block Tree" name="address-block-tree">
+      <el-collapse-item
+        title="Address Block Tree"
+        name="address-block-tree"
+      >
         <IPAddressBlockTree />
       </el-collapse-item>
     </el-collapse>

@@ -1,6 +1,12 @@
 <template>
-  <span class="clickable-block" v-on:click="click">
-    <i v-if="block" class="el-icon-info"></i>
+  <span
+    class="clickable-block"
+    v-on:click="click"
+  >
+    <i
+      v-if="block"
+      class="el-icon-info"
+    />
     {{ block }}
   </span>
 </template>
@@ -10,7 +16,12 @@ import { mapMutations } from 'vuex'
 import { Netmask } from 'netmask'
 
 export default {
-  props: ['block'],
+  props: {
+    block: {
+      type: String,
+      required: true
+    }
+  },
   methods: {
     ...mapMutations(['setIPAddrString', 'setIPBlock']),
     click () {

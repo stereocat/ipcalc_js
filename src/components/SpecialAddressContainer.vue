@@ -2,12 +2,14 @@
   <div>
     <SpecialAddressList
       v-if="containSpecialBlocks.length > 0"
-      v-bind:blocks="containSpecialBlocks">
+      v-bind:blocks="containSpecialBlocks"
+    >
       THIS block contains special use address block:
     </SpecialAddressList>
     <SpecialAddressList
       v-if="containedSpecialBlocks.length > 0"
-      v-bind:blocks="containedSpecialBlocks">
+      v-bind:blocks="containedSpecialBlocks"
+    >
       THIS block is contained by special use address block:
     </SpecialAddressList>
   </div>

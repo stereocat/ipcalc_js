@@ -1,13 +1,22 @@
 <template>
   <div>
     <table>
-      <tr><th>Name</th><th>Value</th><th>Binary</th></tr>
-      <tr v-for="(infoDef, index) in this.infoDefs"
-          v-bind:key="infoDef.name"
-          v-bind:class="index % 2 ? 'even-row' : 'odd-row'">
+      <tr>
+        <th>Name</th>
+        <th>Value</th>
+        <th>Binary</th>
+      </tr>
+      <tr
+        v-for="(infoDef, index) in this.infoDefs"
+        v-bind:key="infoDef.name"
+        v-bind:class="index % 2 ? 'even-row' : 'odd-row'"
+      >
         <td class="name">{{ infoDef.name }}</td>
         <td class="value">
-          <AppIPBlockAnchor v-if="infoDef.clickable" v-bind:block="infoDef.value" />
+          <AppIPBlockAnchor
+            v-if="infoDef.clickable"
+            v-bind:block="infoDef.value"
+          />
           <span v-else>{{ infoDef.value }}</span>
         </td>
         <td class="binary">
@@ -16,7 +25,10 @@
         </td>
       </tr>
     </table>
-    <div class="debug" v-bind:style="{ display: debugDisplay }">
+    <div
+      class="debug"
+      v-bind:style="{ display: debugDisplay }"
+    >
       [AddrInfoTable.vue debug]
       ip addr: {{ ipAddrString }}, mask: {{ ipBlock.mask }}
     </div>

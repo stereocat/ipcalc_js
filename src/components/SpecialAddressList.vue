@@ -5,12 +5,15 @@
       <ul>
         <li
           v-for="block in blocks"
-          v-bind:key="block.addrBlock">
+          v-bind:key="block.addrBlock"
+        >
           <span v-bind:class="block.obsoleteRfc ? 'obsoleted' : 'active'">
-            <AppIPBlockAnchor v-bind:block="block.addrBlock" /> : {{ block.description }}.
+            <AppIPBlockAnchor v-bind:block="block.addrBlock" />
+            : {{ block.description }}.
           </span>
           <span v-if="block.obsoleteRfc">
-            (in <AppRFCAnchor v-bind:number="block.obsoleteRfc" />, but no longer reserved.)
+            (in <AppRFCAnchor v-bind:number="block.obsoleteRfc" />,
+            but no longer reserved.)
           </span>
           See: <AppRFCAnchor v-bind:number="block.rfc" />
         </li>
@@ -24,7 +27,12 @@ import AppRFCAnchor from './AppRFCAnchor'
 import AppIPBlockAnchor from './AppIPBlockAnchor'
 
 export default {
-  props: ['blocks'],
+  props: {
+    blocks: {
+      type: Array,
+      required: true
+    }
+  },
   components: {
     AppRFCAnchor,
     AppIPBlockAnchor

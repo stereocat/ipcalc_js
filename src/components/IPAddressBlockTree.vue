@@ -3,7 +3,10 @@
     <div>
       "Address block tree" shows single supernet (parent) and its subnets (children).
     </div>
-    <div class="debug" v-bind:style="{ display: debugDisplay }">
+    <div
+      class="debug"
+      v-bind:style="{ display: debugDisplay }"
+    >
       [AddrBlockTree.vue debug]
       ip address: {{ ipAddrString }}
       ip block: {{ selfBlock }}

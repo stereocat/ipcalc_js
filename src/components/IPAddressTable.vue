@@ -1,13 +1,25 @@
 <template>
   <div>
     <table>
-      <tr><th>Name</th><th>Value</th></tr>
-      <tr v-for="(ipNotation, index) in this.ipNotations"
-          v-bind:key="ipNotation.name"
-          v-bind:class="index % 2 ? 'even-row' : 'odd-row'">
-        <td class="name">{{ ipNotation.name }}</td>
+      <tr>
+        <th>Name</th>
+        <th>Value</th>
+      </tr>
+      <tr
+        v-for="(ipNotation, index) in this.ipNotations"
+        v-bind:key="ipNotation.name"
+        v-bind:class="index % 2 ? 'even-row' : 'odd-row'"
+      >
+        <td class="name">
+          {{ ipNotation.name }}
+        </td>
         <td class="value">
-          <span class="literal-head" v-if="ipNotation.head">{{ ipNotation.head }}</span>
+          <span
+            class="literal-head"
+            v-if="ipNotation.head"
+          >
+            {{ ipNotation.head }}
+          </span>
           <span class="literal-body">{{ ipNotation.body }}</span>
         </td>
       </tr>
