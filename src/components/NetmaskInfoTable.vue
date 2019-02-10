@@ -6,7 +6,10 @@
           v-bind:key="infoDef.name"
           v-bind:class="index % 2 ? 'even-row' : 'odd-row'">
         <td class="name">{{ infoDef.name }}</td>
-        <td class="value">{{ infoDef.value }}</td>
+        <td class="value">
+          <ClickableBlockAnchor v-if="infoDef.clickable" v-bind:block="infoDef.value" />
+          <span v-else>{{ infoDef.value }}</span>
+        </td>
         <td class="binary">
           <span class="bin-head">{{ infoDef.binary.head }}</span>
           <span class="bin-tail">{{ infoDef.binary.tail }}</span>
@@ -23,8 +26,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import ip from 'ip'
+import ClickableBlockAnchor from './ClickableBlockAnchor'
 
 export default {
+  components: {
+    ClickableBlockAnchor
+  },
   data () {
     return {
       debugDisplay: 'none'
@@ -42,11 +49,11 @@ export default {
         { name: 'First Host Address', value: this.ipBlock.first },
         { name: 'Last Host Address', value: this.ipBlock.last },
         { name: 'Broadcast Address', value: this.ipBlock.broadcast },
-        { name: 'Previous CIDR Block', value: this.previousBlockString },
-        { name: 'THIS CIDR Block', value: this.ipBlock.toString() },
-        { name: 'Next CIDR Block', value: this.nextBlockString },
+        { name: 'Previous CIDR Block', value: this.previousBlockString, clickable: true },
+        { name: 'THIS CIDR Block', value: this.ipBlock.toString(), clickable: true },
+        { name: 'Next CIDR Block', value: this.nextBlockString, clickable: true },
         { name: 'Block Size (Number of Addresses)', value: this.ipBlock.size }
-      ].map(d => this.makeInfoDef(d.name, d.value))
+      ].map(d => this.makeInfoDef(d))
     },
     previousBlockString () {
       try {
@@ -64,11 +71,12 @@ export default {
     }
   },
   methods: {
-    makeInfoDef (name, value) {
+    makeInfoDef (d) {
       return {
-        name: name,
-        value: value,
-        binary: this.toBinary(value)
+        name: d.name,
+        value: d.value,
+        clickable: d.clickable,
+        binary: this.toBinary(d.value)
       }
     },
     previousBlock () {

@@ -13,10 +13,10 @@ td {
     padding: 0.2em 1em;
 }
 table tr:hover {
-    background-color: seashell;
+    background-color: lightyellow;
 }
 table td:hover {
-    background-color: lightyellow;
+    background-color: lemonchiffon;
 }
 tr.even-row {
     background-color: white;

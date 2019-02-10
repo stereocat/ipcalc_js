@@ -1,16 +1,24 @@
 rect {
-    opacity: 0.8;
+    stroke: none;
+    fill-opacity: 0.6;
+    transition: fill-opacity .3s ease-in-out
 }
 rect.normalBlock {
-    fill: lavender;
+    fill: #92C591;
 }
 rect.targetBlock {
-    fill: pink;
+    fill: #0A3409;
+}
+rect.selected {
+    fill-opacity: 1.0;
+    transition: fill-opacity .3s ease-in-out
 }
 text {
-    font-family: sans-serif;
     fill: black;
+    font-weight: normal;
+    font-family: sans-serif;
 }
 text.targetBlock {
+    fill: white;
     font-weight: bold;
 }

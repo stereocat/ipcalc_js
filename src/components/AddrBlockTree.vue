@@ -1,5 +1,8 @@
 <template>
   <div id="addr-block-tree">
+    <div>
+      "Address block tree" shows single supernet (parent) and its subnets (children).
+    </div>
     <div class="debug" v-bind:style="{ display: debugDisplay }">
       [AddrBlockTree.vue debug]
       ip address: {{ ipAddrString }}
@@ -9,11 +12,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import ip from 'ip'
 import { Netmask } from 'netmask'
 import { select } from 'd3-selection'
 import { hierarchy, partition } from 'd3-hierarchy'
+import { transition } from 'd3-transition'
+import { easeElasticOut } from 'd3-ease'
 import '../css/addr-tree.css'
 
 export default {
@@ -40,8 +45,8 @@ export default {
     rootNode () {
       // convert to hierarchical Node object
       const rootCidrBlock = this.findOriginBlock()
-      return hierarchy(this.buildAddrTree(rootCidrBlock, this.blockLayerNum))
-        .sum(d => d.size)
+      const addrTreeData = this.buildAddrTree(rootCidrBlock, this.blockLayerNum)
+      return hierarchy(addrTreeData).sum(d => d.size)
     }
   },
   mounted () {
@@ -49,6 +54,9 @@ export default {
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height)
+    // make addr tree diagrams at first
+    this.treeView()
+    // add input watcher
     this.$store.watch(
       // watch both ipAddrString and ipBlock
       state => `${state.ipAddrString}/${this.prefixLength}`,
@@ -59,6 +67,7 @@ export default {
     )
   },
   methods: {
+    ...mapMutations(['setIPAddrString', 'setIPBlock']),
     nParentBlock (gen) {
       if (this.prefixLength < gen) {
         console.log(`${gen}-parent block does not exists (this is maximum block)`)
@@ -78,56 +87,83 @@ export default {
         .padding(10)
         .size([this.height, this.width])
     },
+    rectTransition () {
+      return transition()
+        .duration(500)
+        .ease(easeElasticOut)
+    },
+    setClass (d) {
+      return d.data.name === this.selfBlock ? 'targetBlock' : 'normalBlock'
+    },
+    addHighlightToRect (d) {
+      select(`rect[id='${d.data.name}']`)
+        .classed('selected', true)
+    },
+    removeHighlightToRect (d) {
+      select(`rect[id='${d.data.name}']`)
+        .classed('selected', false)
+    },
+    updateStateToBlock (d) {
+      const block = new Netmask(d.data.name)
+      this.setIPAddrString(block.base)
+      this.setIPBlock(block)
+    },
+    setObjectPositionForTransition (target) {
+      const p = 10
+      this.svg.selectAll(target)
+        .attr('x', d => d.y0 + p)
+    },
+    createRectangles (data) {
+      // NOTICE: transposed x/y
+      // rectangles (NodeTree map)
+      const svgRect = this.svg
+        .selectAll('rect')
+        .data(data)
+      const svgRectEnter = svgRect // 1st time (if not exists rectangles)
+        .enter()
+        .append('rect')
+      svgRect.merge(svgRectEnter)
+        .attr('id', d => `${d.data.name}`)
+        .attr('class', this.setClass)
+        .on('mouseover', this.addHighlightToRect)
+        .on('mouseout', this.removeHighlightToRect)
+        .on('click', this.updateStateToBlock)
+        .attr('rx', 5)
+        .attr('ry', 5)
+        .attr('width', d => d.y1 - d.y0)
+        .attr('height', d => d.x1 - d.x0)
+        .transition(this.rectTransition())
+        .delay((d, i) => i * 30)
+        .attr('x', d => d.y0)
+        .attr('y', d => d.x0)
+    },
+    createLabels (data) {
+      // labels for rectangles (address block)
+      const svgText = this.svg.selectAll('text')
+        .data(data)
+      const svgTextEnter = svgText // 1st time (if not exists rectangles)
+        .enter()
+        .append('text')
+      svgTextEnter.merge(svgText)
+        .attr('class', this.setClass)
+        .on('mouseover', this.addHighlightToRect)
+        .on('mouseout', this.removeHighlightToRect)
+        .on('click', this.updateStateToBlock)
+        .transition(this.rectTransition())
+        .delay((d, i) => i * 25)
+        .attr('x', d => d.y0)
+        .attr('y', d => d.x0)
+        .attr('dx', 5)
+        .attr('dy', 15)
+        .text(d => d.data.name)
+    },
     treeView () {
       const layout = this.makeLayout()
       const layoutedNodeTree = layout(this.rootNode)
-
-      const setClass = (d) => {
-        return d.data.name === this.selfBlock ? 'targetBlock' : 'normalBlock'
-      }
-
-      // NOTICE: transposed x/y
-
-      // rectangles (NodeTree map)
-      const svgRects = this.svg
-        .selectAll('rect')
-        .data(layoutedNodeTree.descendants())
-      svgRects.enter()
-        .append('rect')
-        .attr('class', setClass)
-        .attr('x', d => d.y0)
-        .attr('y', d => d.x0)
-        .attr('width', d => d.y1 - d.y0)
-        .attr('height', d => d.x1 - d.x0)
-      svgRects.exit()
-        .remove()
-      svgRects
-        .attr('class', setClass)
-        .attr('x', d => d.y0)
-        .attr('y', d => d.x0)
-        .attr('width', d => d.y1 - d.y0)
-        .attr('height', d => d.x1 - d.x0)
-
-      // text label
-      const svgTexts = this.svg.selectAll('text')
-        .data(layoutedNodeTree.descendants())
-      svgTexts.enter()
-        .append('text')
-        .attr('x', d => d.y0)
-        .attr('y', d => d.x0)
-        .attr('dx', 5)
-        .attr('dy', 15)
-        .attr('class', setClass)
-        .text(d => d.data.name)
-      svgTexts.exit()
-        .remove()
-      svgTexts
-        .attr('x', d => d.y0)
-        .attr('y', d => d.x0)
-        .attr('dx', 5)
-        .attr('dy', 15)
-        .attr('class', setClass)
-        .text(d => d.data.name)
+      this.setObjectPositionForTransition('rect')
+      this.createRectangles(layoutedNodeTree.descendants())
+      this.setObjectPositionForTransition('text')
+      this.createLabels(layoutedNodeTree.descendants())
     },
     buildAddrTree (cidrStr, layerNum) {
       const subnet = ip.cidrSubnet(cidrStr)
