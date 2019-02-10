@@ -32,8 +32,16 @@ export default {
       delayTimer: null
     }
   },
+  mounted () {
+    this.$store.watch(
+      state => `${state.ipAddrString}/${state.ipBlock.bitmask}`,
+      (newStr, oldStr) => {
+        this.inputString = newStr
+      }
+    )
+  },
   methods: {
-    ...mapMutations(['ipAddrString', 'ipBlock']),
+    ...mapMutations(['setIPAddrString', 'setIPBlock']),
     validateInputAsIPNetmask () {
       try {
         this.candidateIPBlock = new Netmask(this.inputString)
@@ -71,8 +79,8 @@ export default {
       clearTimeout(this.delayTimer)
       this.delayTimer = setTimeout(() => {
         // mutation
-        this.ipAddrString(this.candidateIPAddrString)
-        this.ipBlock(this.candidateIPBlock)
+        this.setIPAddrString(this.candidateIPAddrString)
+        this.setIPBlock(this.candidateIPBlock)
       }, 500)
     }
   }

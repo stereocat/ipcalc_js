@@ -22,10 +22,10 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    ipAddrString (state, payload) {
+    setIPAddrString (state, payload) {
       state.ipAddrString = payload
     },
-    ipBlock (state, payload) {
+    setIPBlock (state, payload) {
       state.ipBlock = payload
     }
   }

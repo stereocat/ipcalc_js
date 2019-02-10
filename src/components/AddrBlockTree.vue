@@ -1,5 +1,8 @@
 <template>
   <div id="addr-block-tree">
+    <div>
+      "Address block tree" shows single supernet (parent) and its subnets (children).
+    </div>
     <div class="debug" v-bind:style="{ display: debugDisplay }">
       [AddrBlockTree.vue debug]
       ip address: {{ ipAddrString }}
@@ -9,7 +12,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import ip from 'ip'
 import { Netmask } from 'netmask'
 import { select } from 'd3-selection'
@@ -64,6 +67,7 @@ export default {
     )
   },
   methods: {
+    ...mapMutations(['setIPAddrString', 'setIPBlock']),
     nParentBlock (gen) {
       if (this.prefixLength < gen) {
         console.log(`${gen}-parent block does not exists (this is maximum block)`)
@@ -91,9 +95,22 @@ export default {
     setClass (d) {
       return d.data.name === this.selfBlock ? 'targetBlock' : 'normalBlock'
     },
-    setRectanglesForTransition () {
+    addHighlightToRect (d) {
+      select(`rect[id='${d.data.name}']`)
+        .classed('selected', true)
+    },
+    removeHighlightToRect (d) {
+      select(`rect[id='${d.data.name}']`)
+        .classed('selected', false)
+    },
+    updateStateToBlock (d) {
+      const block = new Netmask(d.data.name)
+      this.setIPAddrString(block.base)
+      this.setIPBlock(block)
+    },
+    setObjectPositionForTransition (target) {
       const p = 10
-      this.svg.selectAll('rect')
+      this.svg.selectAll(target)
         .attr('x', d => d.y0 + p)
     },
     createRectangles (data) {
@@ -106,18 +123,19 @@ export default {
         .enter()
         .append('rect')
       svgRect.merge(svgRectEnter)
-        .transition(this.rectTransition())
-        .delay((d, i) => i * 30)
+        .attr('id', d => `${d.data.name}`)
         .attr('class', this.setClass)
+        .on('mouseover', this.addHighlightToRect)
+        .on('mouseout', this.removeHighlightToRect)
+        .on('click', this.updateStateToBlock)
+        .attr('rx', 5)
+        .attr('ry', 5)
         .attr('width', d => d.y1 - d.y0)
         .attr('height', d => d.x1 - d.x0)
+        .transition(this.rectTransition())
+        .delay((d, i) => i * 30)
         .attr('x', d => d.y0)
         .attr('y', d => d.x0)
-    },
-    setLabelsForTransition () {
-      const p = 10
-      this.svg.selectAll('text')
-        .attr('x', d => d.y0 + p)
     },
     createLabels (data) {
       // labels for rectangles (address block)
@@ -127,21 +145,24 @@ export default {
         .enter()
         .append('text')
       svgTextEnter.merge(svgText)
+        .attr('class', this.setClass)
+        .on('mouseover', this.addHighlightToRect)
+        .on('mouseout', this.removeHighlightToRect)
+        .on('click', this.updateStateToBlock)
         .transition(this.rectTransition())
         .delay((d, i) => i * 25)
         .attr('x', d => d.y0)
         .attr('y', d => d.x0)
         .attr('dx', 5)
         .attr('dy', 15)
-        .attr('class', this.setClass)
         .text(d => d.data.name)
     },
     treeView () {
       const layout = this.makeLayout()
       const layoutedNodeTree = layout(this.rootNode)
-      this.setRectanglesForTransition()
+      this.setObjectPositionForTransition('rect')
       this.createRectangles(layoutedNodeTree.descendants())
-      this.setLabelsForTransition()
+      this.setObjectPositionForTransition('text')
       this.createLabels(layoutedNodeTree.descendants())
     },
     buildAddrTree (cidrStr, layerNum) {
