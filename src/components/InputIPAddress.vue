@@ -7,6 +7,7 @@
       placeholder="e.g. 127.0.0.1/8" />
     <transition>
       <div id="input-warning" v-if="!validInput" class="input-warning">
+        <i class="el-icon-warning"></i>
         There is invalid IP/Mask(or prefix length) input.
       </div>
     </transition>

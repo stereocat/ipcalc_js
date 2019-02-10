@@ -5,7 +5,7 @@
       <ul>
         <li v-for="block in blocks" v-bind:key="block.addrBlock">
           <span v-bind:class="block.obsoleteRfc ? 'obsoleted' : 'active'">
-            <strong>{{ block.addrBlock }}</strong> : {{ block.description }}.
+            <ClickableBlockAnchor v-bind:block="block.addrBlock" /> : {{ block.description }}.
           </span>
           <span v-if="block.obsoleteRfc">
             (in <RfcAnchor v-bind:number="block.obsoleteRfc" />, but no longer reserved.)
@@ -19,10 +19,13 @@
 
 <script>
 import RfcAnchor from './RfcAnchor'
+import ClickableBlockAnchor from './ClickableBlockAnchor'
+
 export default {
   props: ['blocks'],
   components: {
-    RfcAnchor
+    RfcAnchor,
+    ClickableBlockAnchor
   }
 }
 </script>
@@ -36,6 +39,9 @@ div.addr-info {
 }
 .active strong {
   text-decoration: underline;
+}
+ul {
+  list-style-type: none;
 }
 .obsoleted {
   color: #888;
