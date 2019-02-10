@@ -1,5 +1,5 @@
 <template>
-  <div id="addr-block-tree">
+  <div id="ipaddr-block-tree">
     <div>
       "Address block tree" shows single supernet (parent) and its subnets (children).
     </div>
@@ -50,7 +50,7 @@ export default {
     }
   },
   mounted () {
-    this.svg = select('div#addr-block-tree')
+    this.svg = select('div#ipaddr-block-tree')
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height)

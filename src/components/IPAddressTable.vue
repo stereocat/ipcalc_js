@@ -1,5 +1,5 @@
 <template>
-  <div id="ip-addr-info-table">
+  <div>
     <table>
       <tr><th>Name</th><th>Value</th></tr>
       <tr v-for="(ipNotation, index) in this.ipNotations"

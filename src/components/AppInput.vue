@@ -1,5 +1,5 @@
 <template>
-  <div id="input-ip-address">
+  <div>
     <el-input
       size="large" autofocus
       v-model="inputString"

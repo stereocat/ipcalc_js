@@ -1,27 +1,27 @@
 <template>
-  <div id="special-addr-info">
-    <AddrInfoBlock
+  <div>
+    <SpecialAddressList
       v-if="containSpecialBlocks.length > 0"
       v-bind:blocks="containSpecialBlocks">
       THIS block contains special use address block:
-    </AddrInfoBlock>
-    <AddrInfoBlock
+    </SpecialAddressList>
+    <SpecialAddressList
       v-if="containedSpecialBlocks.length > 0"
       v-bind:blocks="containedSpecialBlocks">
       THIS block is contained by special use address block:
-    </AddrInfoBlock>
+    </SpecialAddressList>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import { Netmask } from 'netmask'
-import AddrInfoBlock from './AddrInfoBlock'
+import SpecialAddressList from './SpecialAddressList'
 import blockList from '../js/special-addr-info-defs'
 
 export default {
   components: {
-    AddrInfoBlock
+    SpecialAddressList
   },
   computed: {
     ...mapGetters(['ipAddrString', 'ipBlock']),
@@ -31,7 +31,6 @@ export default {
       })
     },
     containedSpecialBlocks () {
-      // always returns 0 or 1 element array
       return blockList.filter(d => {
         const sp = new Netmask(d.addrBlock)
         return sp.contains(this.ipBlock.toString())

@@ -1,39 +1,39 @@
 <template>
   <div id="app">
-    <IPCalcHeader />
-    <InputIPAddress />
+    <AppHeader />
+    <AppInput />
     <el-collapse v-model="activeNames">
       <el-collapse-item title="IP Info Table" name="ip-info">
-        <IPAddrInfoTable />
+        <IPAddressTable />
       </el-collapse-item>
       <el-collapse-item title="Netmask Info Table" name="netmask-info">
-        <NetmaskInfoTable />
-        <SpecialAddrInfo />
+        <NetmaskTable />
+        <SpecialAddressContainer />
       </el-collapse-item>
       <el-collapse-item title="Address Block Tree" name="address-block-tree">
-        <AddrBlockTree />
+        <IPAddressBlockTree />
       </el-collapse-item>
     </el-collapse>
   </div>
 </template>
 
 <script>
-import IPCalcHeader from './components/IPCalcHeader'
-import InputIPAddress from './components/InputIPAddress'
-import IPAddrInfoTable from './components/IPAddrInfoTable'
-import NetmaskInfoTable from './components/NetmaskInfoTable'
-import SpecialAddrInfo from './components/SpecialAddrInfo'
-import AddrBlockTree from './components/AddrBlockTree'
+import AppHeader from './components/AppHeader'
+import AppInput from './components/AppInput'
+import IPAddressTable from './components/IPAddressTable'
+import NetmaskTable from './components/NetmaskTable'
+import SpecialAddressContainer from './components/SpecialAddressContainer'
+import IPAddressBlockTree from './components/IPAddressBlockTree'
 
 export default {
   name: 'app',
   components: {
-    IPCalcHeader,
-    InputIPAddress,
-    IPAddrInfoTable,
-    NetmaskInfoTable,
-    SpecialAddrInfo,
-    AddrBlockTree
+    AppHeader,
+    AppInput,
+    IPAddressTable,
+    NetmaskTable,
+    SpecialAddressContainer,
+    IPAddressBlockTree
   },
   data () {
     return {

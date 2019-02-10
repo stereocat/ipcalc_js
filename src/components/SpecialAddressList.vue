@@ -3,14 +3,16 @@
     <div class="addr-info">
       <slot />
       <ul>
-        <li v-for="block in blocks" v-bind:key="block.addrBlock">
+        <li
+          v-for="block in blocks"
+          v-bind:key="block.addrBlock">
           <span v-bind:class="block.obsoleteRfc ? 'obsoleted' : 'active'">
-            <ClickableBlockAnchor v-bind:block="block.addrBlock" /> : {{ block.description }}.
+            <AppIPBlockAnchor v-bind:block="block.addrBlock" /> : {{ block.description }}.
           </span>
           <span v-if="block.obsoleteRfc">
-            (in <RfcAnchor v-bind:number="block.obsoleteRfc" />, but no longer reserved.)
+            (in <AppRFCAnchor v-bind:number="block.obsoleteRfc" />, but no longer reserved.)
           </span>
-          See: <RfcAnchor v-bind:number="block.rfc" />
+          See: <AppRFCAnchor v-bind:number="block.rfc" />
         </li>
       </ul>
     </div>
@@ -18,14 +20,14 @@
 </template>
 
 <script>
-import RfcAnchor from './RfcAnchor'
-import ClickableBlockAnchor from './ClickableBlockAnchor'
+import AppRFCAnchor from './AppRFCAnchor'
+import AppIPBlockAnchor from './AppIPBlockAnchor'
 
 export default {
   props: ['blocks'],
   components: {
-    RfcAnchor,
-    ClickableBlockAnchor
+    AppRFCAnchor,
+    AppIPBlockAnchor
   }
 }
 </script>

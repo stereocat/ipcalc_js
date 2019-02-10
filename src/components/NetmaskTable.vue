@@ -1,5 +1,5 @@
 <template>
-  <div id="netmask-info-table">
+  <div>
     <table>
       <tr><th>Name</th><th>Value</th><th>Binary</th></tr>
       <tr v-for="(infoDef, index) in this.infoDefs"
@@ -7,7 +7,7 @@
           v-bind:class="index % 2 ? 'even-row' : 'odd-row'">
         <td class="name">{{ infoDef.name }}</td>
         <td class="value">
-          <ClickableBlockAnchor v-if="infoDef.clickable" v-bind:block="infoDef.value" />
+          <AppIPBlockAnchor v-if="infoDef.clickable" v-bind:block="infoDef.value" />
           <span v-else>{{ infoDef.value }}</span>
         </td>
         <td class="binary">
@@ -26,11 +26,11 @@
 <script>
 import { mapGetters } from 'vuex'
 import ip from 'ip'
-import ClickableBlockAnchor from './ClickableBlockAnchor'
+import AppIPBlockAnchor from './AppIPBlockAnchor'
 
 export default {
   components: {
-    ClickableBlockAnchor
+    AppIPBlockAnchor
   },
   data () {
     return {
