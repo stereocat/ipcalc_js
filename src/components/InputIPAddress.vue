@@ -29,7 +29,8 @@ export default {
       candidateIPAddrString: '',
       candidateIPBlock: null,
       validInput: true,
-      delayTimer: null
+      delayTimer: null,
+      delay: 750
     }
   },
   mounted () {
@@ -81,7 +82,7 @@ export default {
         // mutation
         this.setIPAddrString(this.candidateIPAddrString)
         this.setIPBlock(this.candidateIPBlock)
-      }, 500)
+      }, this.delay)
     }
   }
 }
