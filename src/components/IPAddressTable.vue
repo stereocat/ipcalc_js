@@ -6,7 +6,7 @@
         <th>Value</th>
       </tr>
       <tr
-        v-for="(ipNotation, index) in this.ipNotations"
+        v-for="(ipNotation, index) in ipNotations"
         v-bind:key="ipNotation.name"
         v-bind:class="index % 2 ? 'even-row' : 'odd-row'"
       >

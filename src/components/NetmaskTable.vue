@@ -7,7 +7,7 @@
         <th>Binary</th>
       </tr>
       <tr
-        v-for="(infoDef, index) in this.infoDefs"
+        v-for="(infoDef, index) in infoDefs"
         v-bind:key="infoDef.name"
         v-bind:class="index % 2 ? 'even-row' : 'odd-row'"
       >
@@ -71,14 +71,14 @@ export default {
       try {
         return this.previousBlock().toString()
       } catch {
-        return null
+        return ""
       }
     },
     nextBlockString () {
       try {
         return this.nextBlock().toString()
       } catch {
-        return null
+        return ""
       }
     }
   },
@@ -93,17 +93,17 @@ export default {
     },
     previousBlock () {
       const prevBlock = this.ipBlock.next(-1)
-      if (ip.toLong(prevBlock.base) > ip.toLong(this.ipBlock.base)) {
-        return null
+      if (ip.toLong(prevBlock.base) <= ip.toLong(this.ipBlock.base)) {
+        return prevBlock
       }
-      return prevBlock
+      return ""
     },
     nextBlock () {
       const nextBlock = this.ipBlock.next(1)
-      if (ip.toLong(nextBlock.base) < ip.toLong(this.ipBlock.base)) {
-        return null
+      if (ip.toLong(nextBlock.base) >= ip.toLong(this.ipBlock.base)) {
+        return nextBlock
       }
-      return nextBlock
+      return ""
     },
     toBinary (dottedStr) {
       const nullValue = { head: '', tail: '' }

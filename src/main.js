@@ -1,11 +1,14 @@
-import Vue from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue'
+import { ElInput, ElCollapse, ElCollapseItem } from 'element-plus'
 import store from './store'
-import './plugins/element.js'
+import App from './App.vue'
 
-Vue.config.productionTip = false
-
-new Vue({
-  store,
-  render: h => h(App)
-}).$mount('#app')
+const app = createApp(App)
+// element-ui
+app.use(ElInput)
+app.use(ElCollapse)
+app.use(ElCollapseItem)
+// vuex
+app.use(store)
+// mount application
+app.mount('#app')

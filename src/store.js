@@ -1,13 +1,10 @@
-import Vue from 'vue'
 import Vuex from 'vuex'
 import { Netmask } from 'netmask'
-
-Vue.use(Vuex)
 
 const initAddr = '127.0.0.1'
 const initPrefixLength = 8
 
-export default new Vuex.Store({
+export default Vuex.createStore({
   strict: process.env.NODE_ENV !== 'production',
   state: {
     ipAddrString: initAddr,

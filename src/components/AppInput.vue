@@ -3,7 +3,7 @@
     <el-input
       size="large" autofocus
       v-model="inputString"
-      v-on:keyup.native="updateIPAddressString"
+      @keyup="updateIPAddressString"
       placeholder="e.g. 127.0.0.1/8" />
     <transition>
       <div
@@ -44,9 +44,7 @@ export default {
   mounted () {
     this.$store.watch(
       state => `${state.ipAddrString}/${state.ipBlock.bitmask}`,
-      (newStr, oldStr) => {
-        this.inputString = newStr
-      }
+      newStr => this.inputString = newStr
     )
   },
   methods: {

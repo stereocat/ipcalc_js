@@ -1,6 +1,6 @@
 {
   "name": "ipcalc_js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -9,28 +9,29 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "d3-ease": "^1.0.5",
-    "d3-hierarchy": "^1.1.8",
-    "d3-selection": "^1.4.0",
-    "d3-transition": "^1.2.0",
-    "element-ui": "^2.4.5",
-    "express": "^4.16.4",
+    "core-js": "^3.10.0",
+    "d3-ease": "^2.0.0",
+    "d3-hierarchy": "^2.0.0",
+    "d3-selection": "^2.0.0",
+    "d3-transition": "^2.0.0",
+    "element-plus": "^1.0.2-beta.36",
+    "express": "^4.17.1",
     "ip": "^1.1.5",
-    "netmask": "^1.0.6",
-    "vue": "^2.5.22",
-    "vuex": "^3.1.0"
+    "netmask": "^2.0.2",
+    "vue": "^3.0.0",
+    "vuex": "^4.0.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.4.0",
-    "@vue/cli-plugin-eslint": "^3.4.0",
-    "@vue/cli-service": "^3.4.0",
-    "@vue/eslint-config-standard": "^4.0.0",
-    "babel-eslint": "^10.0.1",
+    "@vue/cli-plugin-babel": "~4.5.12",
+    "@vue/cli-plugin-eslint": "~4.5.12",
+    "@vue/cli-service": "~4.5.12",
+    "@vue/compiler-sfc": "^3.0.11",
+    "babel-eslint": "^10.1.0",
     "babel-plugin-component": "^1.1.1",
-    "eslint": "^5.8.0",
-    "eslint-plugin-vue": "^5.0.0",
-    "vue-cli-plugin-element": "^1.0.1",
-    "vue-template-compiler": "^2.5.21"
+    "babel-plugin-import": "^1.13.3",
+    "eslint": "^6.8.0",
+    "eslint-plugin-vue": "^7.8.0",
+    "vue-cli-plugin-element-plus": "~0.0.13"
   },
   "eslintConfig": {
     "root": true,
@@ -38,22 +39,17 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/essential",
-      "@vue/standard"
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
     ],
-    "rules": {},
     "parserOptions": {
       "parser": "babel-eslint"
-    }
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
+    },
+    "rules": {}
   },
   "browserslist": [
     "> 1%",
     "last 2 versions",
-    "not ie <= 8"
+    "not dead"
   ]
 }

@@ -62,10 +62,7 @@ export default {
     this.$store.watch(
       // watch both ipAddrString and ipBlock
       state => `${state.ipAddrString}/${this.prefixLength}`,
-      (newStr, oldStr) => {
-        // console.log(`watch store: ${oldStr} -> ${newStr}`)
-        this.treeView()
-      }
+      () => this.treeView()
     )
   },
   methods: {
@@ -73,7 +70,7 @@ export default {
     nParentBlock (gen) {
       if (this.prefixLength < gen) {
         console.log(`${gen}-parent block does not exists (this is maximum block)`)
-        return null
+        return "0.0.0.0/0"
       }
       const parentBlock = new Netmask(`${this.networkAddress}/${this.prefixLength - gen}`)
       return parentBlock.toString()
@@ -97,15 +94,15 @@ export default {
     setClass (d) {
       return d.data.name === this.selfBlock ? 'targetBlock' : 'normalBlock'
     },
-    addHighlightToRect (d) {
+    addHighlightToRect (_event, d) {
       select(`rect[id='${d.data.name}']`)
         .classed('selected', true)
     },
-    removeHighlightFromRect (d) {
+    removeHighlightFromRect (_event, d) {
       select(`rect[id='${d.data.name}']`)
         .classed('selected', false)
     },
-    updateStateToBlock (d) {
+    updateStateToBlock (_event, d) {
       const block = new Netmask(d.data.name)
       this.setIPAddrString(block.base)
       this.setIPBlock(block)
