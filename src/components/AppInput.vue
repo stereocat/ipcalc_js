@@ -33,18 +33,23 @@ export default {
   data () {
     return {
       debugDisplay: 'none',
-      inputString: '',
+      inputString: '', // binded input (textbox)
       candidateIPAddrString: '',
       candidateIPBlock: null,
       validInput: true,
+      useBitmask: true, // default: bitmask (prefix-length) format
       delayTimer: null,
-      delay: 500 // msec
+      delay: 1000 // msec
     }
   },
   mounted () {
     this.$store.watch(
       // change detection ip/mask string from state info.
-      state => `${state.ipAddrString}/${state.ipBlock.bitmask}`,
+      state => {
+        return this.useBitmask ?
+          `${state.ipAddrString}/${state.ipBlock.bitmask}` :
+          `${state.ipAddrString}/${state.ipBlock.mask}`
+      },
       // when state change: update inputString (textbox)
       newStr => this.inputString = newStr
     )
@@ -53,14 +58,17 @@ export default {
     ...mapMutations(['setIPAddrString', 'setIPBlock']),
     validMaskString(maskStr) {
       if (maskStr === undefined || maskStr === null || maskStr === '') {
+        this.useBitmask = true
         return true // assume /32 mask
+      }
+      if (maskStr.match(/\/?\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) {
+        this.useBitmask = false
+        return true // assume bitmask specified
       }
       const m = maskStr.match(/\/?(\d{1,3})$/)
       if (m && 0 <= parseInt(m[1]) && parseInt(m[1]) <= 32) {
+        this.useBitmask = true
         return true // assume preflx-length specified
-      }
-      if (maskStr.match(/\/?\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) {
-        return true // assume bitmask specified
       }
       return false
     },
