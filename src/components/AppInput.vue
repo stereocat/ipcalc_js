@@ -38,52 +38,55 @@ export default {
       candidateIPBlock: null,
       validInput: true,
       delayTimer: null,
-      delay: 750
+      delay: 500 // msec
     }
   },
   mounted () {
     this.$store.watch(
+      // change detection ip/mask string from state info.
       state => `${state.ipAddrString}/${state.ipBlock.bitmask}`,
+      // when state change: update inputString (textbox)
       newStr => this.inputString = newStr
     )
   },
   methods: {
     ...mapMutations(['setIPAddrString', 'setIPBlock']),
+    validMaskString(maskStr) {
+      if (maskStr === undefined || maskStr === null || maskStr === '') {
+        return true // assume /32 mask
+      }
+      const m = maskStr.match(/\/?(\d{1,3})$/)
+      if (m && 0 <= parseInt(m[1]) && parseInt(m[1]) <= 32) {
+        return true // assume preflx-length specified
+      }
+      if (maskStr.match(/\/?\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) {
+        return true // assume bitmask specified
+      }
+      return false
+    },
     validateInputAsIPNetmask () {
       try {
-        this.candidateIPBlock = new Netmask(this.inputString)
-        return true
+        const match = this.inputString.match(/([\d.]+)(\/.*)?/)
+        if (match && match[1].match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/) && this.validMaskString(match[2])) {
+          this.candidateIPAddrString = match[1]
+          this.candidateIPBlock = new Netmask(this.inputString)
+          return true
+        }
+        return false
       } catch {
         // Error if the Netmask cannot accept input.
         return false
       }
     },
-    extractIPAddrStringFromInput () {
-      // extract ip part
-      const match = this.inputString.match(/([\d.]+)(\/.*)?/)
-      if (match) {
-        if (match[1].match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) {
-          this.candidateIPAddrString = match[1]
-        } else {
-          // when used abbrev ip string (e.g. 192.168 => '192.168.0.0')
-          this.candidateIPAddrString = this.candidateIPBlock.base
-        }
-      }
-    },
-    validateInputString () {
-      this.validInput = this.validateInputAsIPNetmask()
-      if (this.validInput) {
-        this.extractIPAddrStringFromInput()
-      }
-    },
     updateIPAddressString () {
+      // clear if delayTime exists while editing textbox...
+      clearTimeout(this.delayTimer)
       // validate ASAP for each key input
-      this.validateInputString()
+      this.validInput = this.validateInputAsIPNetmask()
       if (!this.validInput) {
         return
       }
-      // wait to update app state when finish input
-      clearTimeout(this.delayTimer)
+      // wait to update app state (datastore) when finish input
       this.delayTimer = setTimeout(() => {
         // mutation
         this.setIPAddrString(this.candidateIPAddrString)
