@@ -39,7 +39,11 @@ export default {
       validInput: true,
       useBitmask: true, // default: bitmask (prefix-length) format
       delayTimer: null,
-      delay: 1000 // msec
+      // constants
+      delay: 1000, // msec
+      ipv4Regexp: /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$/,
+      ipv4BitmaskRegexp: /^\/?(?:3[0-2]|[12]?\d)$/,
+      ipv4MaskRegexp: /^\/?(?:(?:25[245]|24[08]|224|192|128|0)\.){3}(?:25[245]|24[08]|224|192|128|0)$/
     }
   },
   mounted () {
@@ -61,12 +65,11 @@ export default {
         this.useBitmask = true
         return true // assume /32 mask
       }
-      if (maskStr.match(/\/?\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/)) {
+      if (maskStr.match(this.ipv4MaskRegexp)) {
         this.useBitmask = false
         return true // assume bitmask specified
       }
-      const m = maskStr.match(/\/?(\d{1,3})$/)
-      if (m && 0 <= parseInt(m[1]) && parseInt(m[1]) <= 32) {
+      if (maskStr.match(this.ipv4BitmaskRegexp)) {
         this.useBitmask = true
         return true // assume preflx-length specified
       }
@@ -75,14 +78,14 @@ export default {
     validateInputAsIPNetmask () {
       try {
         const match = this.inputString.match(/([\d.]+)(\/.*)?/)
-        if (match && match[1].match(/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/) && this.validMaskString(match[2])) {
+        if (match && match[1].match(this.ipv4Regexp) && this.validMaskString(match[2])) {
           this.candidateIPAddrString = match[1]
           this.candidateIPBlock = new Netmask(this.inputString)
           return true
         }
         return false
       } catch {
-        // Error if the Netmask cannot accept input.
+        // Error if the inputString is not acceptable ip-address/(bit)mask format string
         return false
       }
     },
