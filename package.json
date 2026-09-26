@@ -6,7 +6,6 @@
     "serve": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "start": "node server.js",
     "dev": "vite",
     "preview": "vite preview",
     "test": "vitest run"
@@ -18,7 +17,6 @@
     "d3-selection": "^3.0.0",
     "d3-transition": "^3.0.1",
     "element-plus": "^2.14.6",
-    "express": "^5.2.1",
     "ipaddr.js": "^2.5.0",
     "netmask": "^2.1.1",
     "pinia": "^4.0.3",

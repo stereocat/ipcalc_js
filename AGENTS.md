@@ -16,7 +16,7 @@
 - IPv4の解析・変換・CIDR境界計算は`src/js/ip-address.js`へ集約し、コンポーネント内へ重複実装しないでください。
 - 標準の4オクテット10進表記だけを受け付け、`127.1`、8進数、16進数などを暗黙に許可しないでください。
 - 表、特殊アドレス結果、D3ツリーのCIDR選択は、同じ共有状態を更新して全表示へ反映される必要があります。
-- バックエンドAPIや永続化ストレージはありません。`server.js`は`dist/`を静的配信するだけです。
+- バックエンドAPIや永続化ストレージ、アプリケーション固有の本番サーバーはありません。`dist/`は静的ファイルとして配信します。
 
 ## 主要ファイル
 
@@ -33,7 +33,6 @@
 - `src/components/SpecialAddressContainer.vue`: 特殊用途範囲との包含判定です。
 - `src/js/special-addr-info-defs.js`: 手動管理する特殊用途アドレスデータです。
 - `tests/`: Vitestによるユニットテストとスモークテストです。
-- `server.js`: Express 5による本番静的ファイルサーバーです。
 - `dist/`: Viteが生成する出力です。直接編集しないでください。
 
 ## 開発ワークフロー
@@ -44,14 +43,14 @@ npm run serve
 npm run lint
 npm test
 npm run build
-npm start
+npm run preview
 ```
 
 - Node.jsは`.nvmrc`と`package.json`の`engines`に従ってください。
 - `npm run serve`または`npm run dev`でVite開発サーバーを起動します。
 - `npm test`でVitestを1回実行します。
 - `npm run build`で`dist/`を生成します。
-- `npm start`はビルド済み`dist/`を`PORT`またはポート3000で配信します。
+- `npm run preview`はビルド済み`dist/`をローカルで確認するためのコマンドです。本番配信には使用しません。
 - 依存関係を変更した場合は`package.json`と`package-lock.json`を両方更新し、`npm audit`も確認してください。
 
 ## 変更時の指針

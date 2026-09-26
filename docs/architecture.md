@@ -23,7 +23,6 @@
 | サブネット | `netmask` | サブネット属性と前後ブロック計算 |
 | 可視化 | D3モジュール | 階層構築、SVG data join、アニメーション |
 | ビルド | Vite | 開発サーバーと本番バンドル |
-| 配信 | Express 5 | `dist/`の静的配信のみ |
 | 品質 | ESLint 10 | Flat Configによる静的検査 |
 | テスト | Vitest、Vue Test Utils、jsdom | ユニットテストとアプリスモークテスト |
 
@@ -48,12 +47,12 @@ npm run build
   -> dist/
 
 ブラウザ
-  -> Express（npm start）
+  -> 任意の静的Webサーバー
      -> dist/の静的ファイル
      -> クライアント側Vueアプリケーション
 ```
 
-`server.js`は絶対パスで`dist/`を解決し、`process.env.PORT`またはポート3000で待ち受けます。業務APIやSSRは提供しません。
+アプリケーション固有のサーバー実装はありません。`dist/`は任意の静的Webサーバーやホスティングサービスから配信できます。業務APIやSSRは提供しません。ローカルで本番ビルドを確認する場合は`npm run preview`を使用します。
 
 ## 4. 起動処理とコンポーネント構成
 

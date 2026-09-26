@@ -42,13 +42,7 @@ npm run lint
 npm run build
 ```
 
-生成された`dist/`は、次のコマンドでExpressから配信できます。
-
-```sh
-npm start
-```
-
-Viteのプレビューサーバーを利用する場合は、次を実行します。
+生成された`dist/`をローカルで確認する場合は、Viteのプレビューサーバーを利用します。
 
 ```sh
 npm run preview
