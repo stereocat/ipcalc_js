@@ -1,30 +1,28 @@
 <template>
-  <transition>
-    <div class="addr-info">
-      <slot />
-      <ul>
-        <li
-          v-for="block in blocks"
-          v-bind:key="block.addrBlock"
-        >
-          <span v-bind:class="block.obsoleteRfc ? 'obsoleted' : 'active'">
-            <AppIPBlockAnchor v-bind:block="block.addrBlock" />
-            : {{ block.description }}.
-          </span>
-          <span v-if="block.obsoleteRfc">
-            (in <AppRFCAnchor v-bind:number="block.obsoleteRfc" />,
-            but no longer reserved.)
-          </span>
-          See: <AppRFCAnchor v-bind:number="block.rfc" />
-        </li>
-      </ul>
-    </div>
-  </transition>
+  <div class="addr-info">
+    <slot />
+    <ul>
+      <li
+        v-for="block in blocks"
+        v-bind:key="block.addrBlock"
+      >
+        <span v-bind:class="block.obsoleteRfc ? 'obsoleted' : 'active'">
+          <AppIPBlockAnchor v-bind:block="block.addrBlock" />
+          : {{ block.description }}.
+        </span>
+        <span v-if="block.obsoleteRfc">
+          (in <AppRFCAnchor v-bind:number="block.obsoleteRfc" />,
+          but no longer reserved.)
+        </span>
+        See: <AppRFCAnchor v-bind:number="block.rfc" />
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
-import AppRFCAnchor from './AppRFCAnchor'
-import AppIPBlockAnchor from './AppIPBlockAnchor'
+import AppRFCAnchor from './AppRFCAnchor.vue'
+import AppIPBlockAnchor from './AppIPBlockAnchor.vue'
 
 export default {
   props: {
@@ -58,11 +56,5 @@ ul {
 }
 .obsoleted strong {
   text-decoration: none;
-}
-.v-enter, .v-leave-to {
-  opacity: 0;
-}
-.v-enter-active, .v-leave-active {
-  transition: opacity .5s;
 }
 </style>

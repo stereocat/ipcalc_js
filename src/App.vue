@@ -27,12 +27,12 @@
 </template>
 
 <script>
-import AppHeader from './components/AppHeader'
-import AppInput from './components/AppInput'
-import IPAddressTable from './components/IPAddressTable'
-import NetmaskTable from './components/NetmaskTable'
-import SpecialAddressContainer from './components/SpecialAddressContainer'
-import IPBlockTree from './components/IPBlockTree'
+import AppHeader from './components/AppHeader.vue'
+import AppInput from './components/AppInput.vue'
+import IPAddressTable from './components/IPAddressTable.vue'
+import NetmaskTable from './components/NetmaskTable.vue'
+import SpecialAddressContainer from './components/SpecialAddressContainer.vue'
+import IPBlockTree from './components/IPBlockTree.vue'
 
 export default {
   name: 'app',

@@ -1,39 +1,44 @@
 <template>
   <div>
     <table>
-      <tr>
-        <th>Name</th>
-        <th>Value</th>
-      </tr>
-      <tr
-        v-for="(ipNotation, index) in ipNotations"
-        v-bind:key="ipNotation.name"
-        v-bind:class="index % 2 ? 'even-row' : 'odd-row'"
-      >
-        <td class="name">
-          {{ ipNotation.name }}
-        </td>
-        <td class="value">
-          <span
-            class="literal-head"
-            v-if="ipNotation.head"
-          >
-            {{ ipNotation.head }}
-          </span>
-          <span class="literal-body">{{ ipNotation.body }}</span>
-        </td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(ipNotation, index) in ipNotations"
+          v-bind:key="ipNotation.name"
+          v-bind:class="index % 2 ? 'even-row' : 'odd-row'"
+        >
+          <td class="name">
+            {{ ipNotation.name }}
+          </td>
+          <td class="value">
+            <span
+              class="literal-head"
+              v-if="ipNotation.head"
+            >
+              {{ ipNotation.head }}
+            </span>
+            <span class="literal-body">{{ ipNotation.body }}</span>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import ip from 'ip'
+import { mapState } from 'pinia'
+import { useIPStore } from '../store'
+import { ipv4ToLong } from '../js/ip-address'
 
 export default {
   computed: {
-    ...mapGetters(['ipAddrString']),
+    ...mapState(useIPStore, ['ipAddrString']),
     ipNotations () {
       return [
         { name: 'Dotted Decimal', base: null },
@@ -46,7 +51,7 @@ export default {
   },
   methods: {
     convertIPValue (name, base) {
-      let head = ''
+      let head
       switch (base) {
         case 2:
           head = '0b'
@@ -66,7 +71,7 @@ export default {
       return {
         name: name,
         head: head,
-        body: ip.toLong(this.ipAddrString).toString(base)
+        body: ipv4ToLong(this.ipAddrString).toString(base)
       }
     }
   }

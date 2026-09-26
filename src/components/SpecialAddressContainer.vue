@@ -16,17 +16,18 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
 import { Netmask } from 'netmask'
-import SpecialAddressList from './SpecialAddressList'
+import SpecialAddressList from './SpecialAddressList.vue'
 import blockList from '../js/special-addr-info-defs'
+import { useIPStore } from '../store'
 
 export default {
   components: {
     SpecialAddressList
   },
   computed: {
-    ...mapGetters(['ipBlock']),
+    ...mapState(useIPStore, ['ipBlock']),
     containSpecialBlocks () {
       return blockList.filter(d => {
         return this.ipBlock.contains(d.addrBlock)

@@ -1,29 +1,33 @@
 <template>
   <div>
     <table>
-      <tr>
-        <th>Name</th>
-        <th>Value</th>
-        <th>Binary</th>
-      </tr>
-      <tr
-        v-for="(infoDef, index) in infoDefs"
-        v-bind:key="infoDef.name"
-        v-bind:class="index % 2 ? 'even-row' : 'odd-row'"
-      >
-        <td class="name">{{ infoDef.name }}</td>
-        <td class="value">
-          <AppIPBlockAnchor
-            v-if="infoDef.clickable"
-            v-bind:block="infoDef.value"
-          />
-          <span v-else>{{ infoDef.value }}</span>
-        </td>
-        <td class="binary">
-          <span class="bin-head">{{ infoDef.binary.head }}</span>
-          <span class="bin-tail">{{ infoDef.binary.tail }}</span>
-        </td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Value</th>
+          <th>Binary</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(infoDef, index) in infoDefs"
+          v-bind:key="infoDef.name"
+          v-bind:class="index % 2 ? 'even-row' : 'odd-row'"
+        >
+          <td class="name">{{ infoDef.name }}</td>
+          <td class="value">
+            <AppIPBlockAnchor
+              v-if="infoDef.clickable"
+              v-bind:block="infoDef.value"
+            />
+            <span v-else>{{ infoDef.value }}</span>
+          </td>
+          <td class="binary">
+            <span class="bin-head">{{ infoDef.binary.head }}</span>
+            <span class="bin-tail">{{ infoDef.binary.tail }}</span>
+          </td>
+        </tr>
+      </tbody>
     </table>
     <div
       class="debug"
@@ -36,9 +40,10 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import ip from 'ip'
-import AppIPBlockAnchor from './AppIPBlockAnchor'
+import { mapState } from 'pinia'
+import AppIPBlockAnchor from './AppIPBlockAnchor.vue'
+import { useIPStore } from '../store'
+import { ipv4ToByteArray, ipv4ToLong } from '../js/ip-address'
 
 export default {
   components: {
@@ -50,7 +55,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['ipAddrString', 'ipBlock']),
+    ...mapState(useIPStore, ['ipAddrString', 'ipBlock']),
     infoDefs () {
       return [
         { name: 'IP Address', value: this.ipAddrString },
@@ -71,14 +76,14 @@ export default {
       try {
         return this.previousBlock().toString()
       } catch {
-        return ""
+        return ''
       }
     },
     nextBlockString () {
       try {
         return this.nextBlock().toString()
       } catch {
-        return ""
+        return ''
       }
     }
   },
@@ -93,44 +98,40 @@ export default {
     },
     previousBlock () {
       const prevBlock = this.ipBlock.next(-1)
-      if (ip.toLong(prevBlock.base) <= ip.toLong(this.ipBlock.base)) {
+      if (ipv4ToLong(prevBlock.base) <= ipv4ToLong(this.ipBlock.base)) {
         return prevBlock
       }
-      return ""
+      return ''
     },
     nextBlock () {
       const nextBlock = this.ipBlock.next(1)
-      if (ip.toLong(nextBlock.base) >= ip.toLong(this.ipBlock.base)) {
+      if (ipv4ToLong(nextBlock.base) >= ipv4ToLong(this.ipBlock.base)) {
         return nextBlock
       }
-      return ""
+      return ''
     },
     toBinary (dottedStr) {
       const nullValue = { head: '', tail: '' }
-      const matches = /(\d+\.\d+\.\d+\.\d+)(:?\/(\d+))?/.exec(dottedStr)
+      const matches = /(\d+\.\d+\.\d+\.\d+)(?:\/(\d+))?/.exec(dottedStr)
       if (matches) {
-        dottedStr = matches[1] // x.x.x.x/mm => x.x.x.x
+        dottedStr = matches[1]
       } else {
         return nullValue
       }
       try {
-        const buf = ip.toBuffer(dottedStr)
-        const octets = []
-        for (const b of buf) {
-          octets.push(`00000000${Number(b).toString(2)}`.slice(-8))
-        }
+        const octets = ipv4ToByteArray(dottedStr)
+          .map(octet => octet.toString(2).padStart(8, '0'))
         const binDottedStr = octets.join('.')
         const prefixLength = this.ipBlock.bitmask
         if (prefixLength > 0) {
           const sep = prefixLength + Math.floor((prefixLength - 1) / 8)
-          const headStr = binDottedStr.slice(0, sep)
-          const tailStr = binDottedStr.slice(sep)
-          return { head: headStr, tail: tailStr }
-        } else {
-          return { head: '', tail: binDottedStr }
+          return {
+            head: binDottedStr.slice(0, sep),
+            tail: binDottedStr.slice(sep)
+          }
         }
-      } catch (err) {
-        console.log('error in toBinary()')
+        return { head: '', tail: binDottedStr }
+      } catch {
         return nullValue
       }
     }

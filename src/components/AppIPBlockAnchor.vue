@@ -3,19 +3,23 @@
     class="clickable-block"
     v-on:click="click"
   >
-    <i
-      v-if="block"
-      class="el-icon-info"
-    />
+    <el-icon v-if="block">
+      <InfoFilled />
+    </el-icon>
     {{ block }}
   </span>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { InfoFilled } from '@element-plus/icons-vue'
+import { mapActions } from 'pinia'
 import { Netmask } from 'netmask'
+import { useIPStore } from '../store'
 
 export default {
+  components: {
+    InfoFilled
+  },
   props: {
     block: {
       type: String,
@@ -23,11 +27,10 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setIPAddrString', 'setIPBlock']),
+    ...mapActions(useIPStore, ['selectIPBlock']),
     click () {
       const block = new Netmask(this.block)
-      this.setIPAddrString(block.base)
-      this.setIPBlock(block)
+      this.selectIPBlock(block.base, block)
     }
   }
 }

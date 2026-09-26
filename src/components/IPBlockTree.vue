@@ -14,13 +14,14 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
-import ip from 'ip'
+import { mapActions, mapState } from 'pinia'
 import { Netmask } from 'netmask'
 import { select } from 'd3-selection'
 import { hierarchy, partition } from 'd3-hierarchy'
 import { transition } from 'd3-transition'
 import { easeElasticOut } from 'd3-ease'
+import { useIPStore } from '../store'
+import { getIPv4CIDRInfo } from '../js/ip-address'
 import '../css/addr-tree.css'
 
 export default {
@@ -29,12 +30,13 @@ export default {
       debugDisplay: 'none',
       height: 400,
       width: 600,
-      blockLayerNum: 3, // depth: parent(1) + children(2)
-      svg: null
+      blockLayerNum: 3,
+      svg: null,
+      unsubscribeStore: null
     }
   },
   computed: {
-    ...mapGetters(['ipBlock']),
+    ...mapState(useIPStore, ['ipBlock']),
     prefixLength () {
       return this.ipBlock.bitmask
     },
@@ -45,7 +47,6 @@ export default {
       return this.ipBlock.toString()
     },
     rootNode () {
-      // convert to hierarchical Node object
       const rootCidrBlock = this.findOriginBlock()
       const addrTreeData = this.buildAddrTree(rootCidrBlock, this.blockLayerNum)
       return hierarchy(addrTreeData).sum(d => d.size)
@@ -56,21 +57,21 @@ export default {
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height)
-    // make addr tree diagrams at first
     this.treeView()
-    // add input watcher
-    this.$store.watch(
-      // watch both ipAddrString and ipBlock
-      state => `${state.ipAddrString}/${this.prefixLength}`,
-      () => this.treeView()
-    )
+
+    const store = useIPStore()
+    this.unsubscribeStore = store.$subscribe(() => {
+      this.treeView()
+    })
+  },
+  beforeUnmount () {
+    this.unsubscribeStore?.()
   },
   methods: {
-    ...mapMutations(['setIPAddrString', 'setIPBlock']),
+    ...mapActions(useIPStore, ['selectIPBlock']),
     nParentBlock (gen) {
       if (this.prefixLength < gen) {
-        console.log(`${gen}-parent block does not exists (this is maximum block)`)
-        return "0.0.0.0/0"
+        return '0.0.0.0/0'
       }
       const parentBlock = new Netmask(`${this.networkAddress}/${this.prefixLength - gen}`)
       return parentBlock.toString()
@@ -104,8 +105,7 @@ export default {
     },
     updateStateToBlock (_event, d) {
       const block = new Netmask(d.data.name)
-      this.setIPAddrString(block.base)
-      this.setIPBlock(block)
+      this.selectIPBlock(block.base, block)
     },
     setObjectPositionForTransition (target) {
       const p = 10
@@ -113,12 +113,11 @@ export default {
         .attr('x', d => d.y0 + p)
     },
     createRectangles (data) {
-      // NOTICE: transposed x/y
-      // rectangles (NodeTree map)
       const svgRect = this.svg
         .selectAll('rect')
-        .data(data)
-      const svgRectEnter = svgRect // 1st time (if not exists rectangles)
+        .data(data, d => d.data.name)
+      svgRect.exit().remove()
+      const svgRectEnter = svgRect
         .enter()
         .append('rect')
       svgRect.merge(svgRectEnter)
@@ -137,10 +136,11 @@ export default {
         .attr('y', d => d.x0)
     },
     createLabels (data) {
-      // labels for rectangles (address block)
-      const svgText = this.svg.selectAll('text')
-        .data(data)
-      const svgTextEnter = svgText // 1st time (if not exists rectangles)
+      const svgText = this.svg
+        .selectAll('text')
+        .data(data, d => d.data.name)
+      svgText.exit().remove()
+      const svgTextEnter = svgText
         .enter()
         .append('text')
       svgTextEnter.merge(svgText)
@@ -165,20 +165,18 @@ export default {
       this.createLabels(layoutedNodeTree.descendants())
     },
     buildAddrTree (cidrStr, layerNum) {
-      const subnet = ip.cidrSubnet(cidrStr)
-      const nwAddr = subnet.networkAddress
-      const bcAddr = subnet.broadcastAddress
-      const childLength = subnet.subnetMaskLength + 1
-      const headChildNWAddr = ip.cidrSubnet(`${nwAddr}/${childLength}`).networkAddress
-      const tailChildNWAddr = ip.cidrSubnet(`${bcAddr}/${childLength}`).networkAddress
-      if (layerNum === 0 || subnet.subnetMaskLength === 32) {
-        return { name: cidrStr, size: subnet.length }
+      const subnet = getIPv4CIDRInfo(cidrStr)
+      const childLength = subnet.prefixLength + 1
+      if (layerNum === 0 || subnet.prefixLength === 32) {
+        return { name: cidrStr, size: subnet.size }
       }
+      const headChild = getIPv4CIDRInfo(`${subnet.networkAddress}/${childLength}`)
+      const tailChild = getIPv4CIDRInfo(`${subnet.broadcastAddress}/${childLength}`)
       return {
         name: cidrStr,
         children: [
-          this.buildAddrTree(`${headChildNWAddr}/${childLength}`, layerNum - 1),
-          this.buildAddrTree(`${tailChildNWAddr}/${childLength}`, layerNum - 1)
+          this.buildAddrTree(`${headChild.networkAddress}/${childLength}`, layerNum - 1),
+          this.buildAddrTree(`${tailChild.networkAddress}/${childLength}`, layerNum - 1)
         ]
       }
     }
