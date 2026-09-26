@@ -48,6 +48,18 @@ npm run build
 npm run preview
 ```
 
+## GitHub Pagesへの公開
+
+`develop`ブランチへpushすると、GitHub ActionsがLint、テスト、本番ビルドを実行し、成功した`dist/`をGitHub Pagesへ公開します。手動実行もActions画面から行えます。
+
+初回のみ、GitHubリポジトリの「Settings」→「Pages」→「Build and deployment」で、Sourceを「GitHub Actions」に設定してください。公開先は次のURLです。
+
+```text
+https://stereocat.github.io/ipcalc_js/
+```
+
+ビルド時のベースパスはGitHub Pagesの設定から自動取得するため、後から独自ドメインへ変更してもVite設定の書き換えは不要です。
+
 ## ドキュメント
 
 - [AIコーディング向け作業指針](AGENTS.md)

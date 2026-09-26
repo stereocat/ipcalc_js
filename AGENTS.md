@@ -22,6 +22,7 @@
 
 - `index.html`: ViteのHTMLエントリポイントです。
 - `vite.config.mjs`: Vue用Vite設定です。
+- `.github/workflows/deploy-pages.yml`: `develop`ブランチからGitHub Pagesへ検証・ビルド・デプロイします。
 - `src/main.js`: Vue、Pinia、Element Plusを初期化します。
 - `src/App.vue`: ルートレイアウトです。
 - `src/store.js`: 選択中IPv4アドレスと`Netmask`を保持するPiniaストアです。
@@ -51,6 +52,7 @@ npm run preview
 - `npm test`でVitestを1回実行します。
 - `npm run build`で`dist/`を生成します。
 - `npm run preview`はビルド済み`dist/`をローカルで確認するためのコマンドです。本番配信には使用しません。
+- GitHub Pagesビルドでは、Pagesが返すベースパスを`VITE_BASE_PATH`環境変数としてViteへ渡します。ローカルでは未指定のため`/`になります。
 - 依存関係を変更した場合は`package.json`と`package-lock.json`を両方更新し、`npm audit`も確認してください。
 
 ## 変更時の指針

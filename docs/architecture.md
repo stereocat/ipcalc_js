@@ -23,6 +23,7 @@
 | サブネット | `netmask` | サブネット属性と前後ブロック計算 |
 | 可視化 | D3モジュール | 階層構築、SVG data join、アニメーション |
 | ビルド | Vite | 開発サーバーと本番バンドル |
+| 配信 | GitHub Pages、GitHub Actions | 静的ファイルの自動ビルドと公開 |
 | 品質 | ESLint 10 | Flat Configによる静的検査 |
 | テスト | Vitest、Vue Test Utils、jsdom | ユニットテストとアプリスモークテスト |
 
@@ -43,16 +44,22 @@
 ### 本番環境
 
 ```text
-npm run build
-  -> dist/
+developブランチへのpush / 手動実行
+  -> GitHub Actions
+     -> npm ci
+     -> Lint、テスト
+     -> npm run build
+     -> dist/をPages artifactとしてアップロード
 
 ブラウザ
-  -> 任意の静的Webサーバー
+  -> GitHub Pages
      -> dist/の静的ファイル
      -> クライアント側Vueアプリケーション
 ```
 
-アプリケーション固有のサーバー実装はありません。`dist/`は任意の静的Webサーバーやホスティングサービスから配信できます。業務APIやSSRは提供しません。ローカルで本番ビルドを確認する場合は`npm run preview`を使用します。
+`.github/workflows/deploy-pages.yml`がデプロイを定義します。GitHub Pagesの`base_path`を`VITE_BASE_PATH`としてViteへ渡すため、プロジェクトページのサブパスと独自ドメインのどちらにも対応できます。
+
+アプリケーション固有のサーバー実装はありません。`dist/`はGitHub Pages以外の静的Webサーバーからも配信できます。業務APIやSSRは提供しません。ローカルで本番ビルドを確認する場合は`npm run preview`を使用します。
 
 ## 4. 起動処理とコンポーネント構成
 
