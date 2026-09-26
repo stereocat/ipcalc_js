@@ -1,10 +1,16 @@
 <template>
-  <div>
+  <header>
     <h1>IP Calculator</h1>
-    <a href="https://github.com/stereocat/ipcalc_js">
-      <img src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
-    </a>
-  </div>
+    <div class="github-ribbon-container">
+      <a
+        class="github-ribbon"
+        href="https://github.com/stereocat/ipcalc_js"
+        aria-label="Fork ipcalc_js on GitHub"
+      >
+        Fork me on GitHub
+      </a>
+    </div>
+  </header>
 </template>
 
 <script>
@@ -12,10 +18,36 @@ export default {}
 </script>
 
 <style scoped>
-img {
+.github-ribbon-container {
   position: absolute;
+  z-index: 10;
   top: 0;
   right: 0;
-  border: 0;
+  width: 160px;
+  height: 160px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.github-ribbon {
+  position: absolute;
+  top: 38px;
+  right: -52px;
+  width: 220px;
+  padding: 8px 0;
+  color: white;
+  background: #ff7600;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 30%);
+  font: 700 14px/1.2 sans-serif;
+  text-align: center;
+  text-decoration: none;
+  transform: rotate(45deg);
+  pointer-events: auto;
+}
+
+.github-ribbon:hover,
+.github-ribbon:focus-visible {
+  background: #d95f00;
+  text-decoration: underline;
 }
 </style>
